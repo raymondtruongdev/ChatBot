@@ -42,10 +42,12 @@ class _ChatPageState extends State<ChatPage> {
 
   final ScrollController _scrollController = ScrollController();
   void scroolDown() {
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+
     _scrollController.animateTo(
-      _scrollController.position.devicePixelRatio,
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.fastOutSlowIn,
+      _scrollController.position.maxScrollExtent - keyboardHeight + 200,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.linear,
     );
   }
 
@@ -96,13 +98,17 @@ class _ChatPageState extends State<ChatPage> {
     myfocusNode.unfocus();
 
     // Scroll the ListView to the last message
-    setState(() {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.easeOut,
-      );
-    });
+    Future.delayed(
+        const Duration(milliseconds: 200),
+        () => {
+              _scrollController.animateTo(
+                _scrollController.position.maxScrollExtent,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.linear,
+              )
+            });
+
+    setState(() {});
   }
 
   void addMessage({ChatMessage? message}) {
