@@ -1,6 +1,5 @@
 import 'package:chat_bot/consts.dart';
-import 'package:chat_bot/models/face_book_bot.dart';
-import 'package:chat_bot/components/my_textfield.dart';
+import 'package:chat_bot/models/open_ai_bot.dart';
 import 'package:chat_bot/components/textfield_chat_input.dart';
 import 'package:chat_bot/models/message_chat.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +13,7 @@ class ChatPage extends StatefulWidget {
 
 FocusNode myfocusNode = FocusNode();
 
-List<Map<String, dynamic>> messages = [];
+List<ChatMessage> messages = [];
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
@@ -60,20 +59,16 @@ class _ChatPageState extends State<ChatPage> {
 
   sendMessage() {
     if (_messageController.text.isNotEmpty) {
-      //send message
-      // print('Send message');
-
       addMessage(
         message: ChatMessage(
           text: 'who are you',
           user: 'username',
           createdAt: DateTime.now(),
-          role: 'user',
+          role: Role.user,
         ),
-        isUserMessage: true,
       );
 
-      FaceBookBot data = FaceBookBot.fromJson(jsStrBot1);
+      OpenAiData data = OpenAiData.fromJson(jsResponse1);
 
       List<Choice> choices = data.choices ?? [];
       String content = choices[0].message!.content!;
@@ -82,11 +77,10 @@ class _ChatPageState extends State<ChatPage> {
       addMessage(
         message: ChatMessage(
           text: content,
-          user: 'FacebookBot',
+          user: 'ChatBot',
           createdAt: DateTime.now(),
           role: role,
         ),
-        isUserMessage: false,
       );
     }
 
@@ -97,7 +91,6 @@ class _ChatPageState extends State<ChatPage> {
     myfocusNode.unfocus();
 
     // Scroll the ListView to the last message
-
     setState(() {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
@@ -107,8 +100,10 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  void addMessage({ChatMessage? message, bool isUserMessage = false}) {
-    messages.add({"message": message, "isUserMessage": isUserMessage});
+  void addMessage({ChatMessage? message}) {
+    if (message != null) {
+      messages.add(message);
+    }
   }
 
   Widget _buildMessageList() {
@@ -120,7 +115,7 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget _buildMessageItem(var message) {
     return Container(
-      alignment: message["isUserMessage"]
+      alignment: (message.role == Role.user)
           ? Alignment.centerRight
           : Alignment.centerLeft,
       margin: const EdgeInsets.all(10),
@@ -130,45 +125,17 @@ class _ChatPageState extends State<ChatPage> {
           borderRadius: BorderRadius.only(
             bottomLeft: const Radius.circular(20),
             topLeft: const Radius.circular(20),
-            bottomRight: Radius.circular(message["isUserMessage"] ? 0 : 20),
-            topRight: Radius.circular(message["isUserMessage"] ? 20 : 0),
+            bottomRight: Radius.circular((message.role == Role.user) ? 0 : 20),
+            topRight: Radius.circular((message.role == Role.user) ? 20 : 0),
           ),
-          color: message["isUserMessage"]
+          color: (message.role == Role.user)
               ? Colors.deepPurple
               : Colors.green.shade800,
-        ), // <- Moved the closing parenthesis here
-        child: Text('${message["message"].text}', // <- Corrected message access
-            style: const TextStyle(color: Colors.white)),
+        ),
+        child: Text(message.text, style: const TextStyle(color: Colors.white)),
       ),
     );
   }
-
-  // Widget _buildUserInput() {
-  //   return Row(
-  //     children: [
-  //       Expanded(
-  //         child: MyTextField(
-  //           hintText: 'Type a message',
-  //           obscureText: false,
-  //           controller: _messageController,
-  //           focusNode: myfocusNode,
-  //         ),
-  //       ),
-  //       Container(
-  //         decoration:
-  //             const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
-  //         margin: const EdgeInsets.only(right: 25),
-  //         child: IconButton(
-  //           onPressed: sendMessage,
-  //           icon: const Icon(
-  //             Icons.arrow_upward,
-  //             color: Colors.white,
-  //           ),
-  //         ),
-  //       )
-  //     ],
-  //   );
-  // }
 
   Widget _buildUserInput() {
     return TextFieldChatInput(

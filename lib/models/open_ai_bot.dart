@@ -1,4 +1,4 @@
-class FaceBookBot {
+class OpenAiData {
   String? id;
   String? object;
   int? created;
@@ -6,7 +6,7 @@ class FaceBookBot {
   List<Choice>? choices;
   Usage? usage;
 
-  FaceBookBot({
+  OpenAiData({
     this.id,
     this.object,
     this.created,
@@ -15,7 +15,7 @@ class FaceBookBot {
     this.usage,
   });
 
-  factory FaceBookBot.fromJson(Map<String, dynamic> json) => FaceBookBot(
+  factory OpenAiData.fromJson(Map<String, dynamic> json) => OpenAiData(
         id: json['id'] as String?,
         object: json['object'] as String?,
         created: json['created'] as int?,
