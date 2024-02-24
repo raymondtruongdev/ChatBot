@@ -1,8 +1,13 @@
 import 'package:chat_bot/consts.dart';
+import 'package:chat_bot/controller/chatbot_controller.dart';
 import 'package:chat_bot/models/open_ai_bot.dart';
 import 'package:chat_bot/components/textfield_chat_input.dart';
 import 'package:chat_bot/models/message_chat.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+final ChatBotController chatBotController =
+    Get.put(ChatBotController(), permanent: true);
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -61,7 +66,7 @@ class _ChatPageState extends State<ChatPage> {
     if (_messageController.text.isNotEmpty) {
       addMessage(
         message: ChatMessage(
-          text: 'who are you',
+          text: _messageController.text,
           user: 'username',
           createdAt: DateTime.now(),
           role: Role.user,
@@ -102,14 +107,16 @@ class _ChatPageState extends State<ChatPage> {
 
   void addMessage({ChatMessage? message}) {
     if (message != null) {
-      messages.add(message);
+      chatBotController.messages.add(message);
     }
   }
 
   Widget _buildMessageList() {
     return ListView(
       controller: _scrollController,
-      children: messages.map((message) => _buildMessageItem(message)).toList(),
+      children: chatBotController.messages
+          .map((message) => _buildMessageItem(message))
+          .toList(),
     );
   }
 
