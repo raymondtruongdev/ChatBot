@@ -1,10 +1,7 @@
 import 'package:chat_bot/controller/chatbot_controller.dart';
 import 'package:chat_bot/components/textfield_chat_input.dart';
 import 'package:chat_bot/models/message_chat.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 final ChatBotController chatBotController =
@@ -59,7 +56,7 @@ class _ChatPageState extends State<ChatPage> {
         // display header of page
         _topChat(),
         // display all message
-        Expanded(child: _buildMessageList()),
+        Expanded(child: _messageList()),
 
         // user input
         _userInput(),
@@ -101,7 +98,7 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {});
   }
 
-  Widget _buildMessageList() {
+  Widget _messageList() {
     return ListView(
       controller: _scrollController,
       children: chatBotController.messages
@@ -120,8 +117,8 @@ class _ChatPageState extends State<ChatPage> {
         children: [
           Container(
             margin: (message.role == Role.user)
-                ? const EdgeInsets.only(right: 10)
-                : const EdgeInsets.only(left: 10, top: 25, right: 10),
+                ? const EdgeInsets.only(left: 40, right: 10)
+                : const EdgeInsets.only(left: 10, right: 40, top: 25),
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.only(

@@ -21,22 +21,26 @@ class TextFieldChatInput extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Container(
         width: double.infinity,
-        height: 60,
         decoration: BoxDecoration(
           border: Border.all(color: Theme.of(context).colorScheme.tertiary),
           color: (Theme.of(context).colorScheme.secondary),
+          borderRadius: const BorderRadius.all(Radius.circular(30)),
         ),
         child: Row(
           children: [
             Expanded(
-              child: TextField(
-                controller: controller,
-                focusNode: focusNode,
-                maxLines: null,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  fillColor: (Theme.of(context).colorScheme.secondary),
-                  hintText: 'Type a message',
+              child: Container(
+                margin: const EdgeInsets.only(left: 20),
+                child: TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                  maxLines: 5,
+                  minLines: 1,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    fillColor: (Theme.of(context).colorScheme.secondary),
+                    hintText: 'Type a message',
+                  ),
                 ),
               ),
             ),
