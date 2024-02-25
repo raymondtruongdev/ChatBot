@@ -13,10 +13,6 @@ class OpenAIBot {
       "role": "system",
       "content": "Always answer in rhymes.",
     });
-    historyOpenAIMessage.add({
-      "role": "user",
-      "content": "Introduce yourself.",
-    });
     return historyOpenAIMessage; // Return the updated list
   }
 

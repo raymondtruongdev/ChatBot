@@ -24,6 +24,11 @@ class ChatBotController extends GetxController {
     return messages;
   }
 
+  List<ChatMessage> resetMessageShowList() {
+    messages = [];
+    return messages;
+  }
+
   void resetHistoryBot() {
     _historyOpenAIMessage = OpenAIBot.resetHistoryOpenAIMessage();
   }

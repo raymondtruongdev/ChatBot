@@ -1,0 +1,19 @@
+  Widget _buildMessageList() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOut,
+      );
+    });
+
+    return SingleChildScrollView(
+      reverse: true,
+      controller: _scrollController,
+      child: Column(
+        children: chatBotController.messages
+            .map((message) => _buildMessageItem(message))
+            .toList(),
+      ),
+    );
+  }
