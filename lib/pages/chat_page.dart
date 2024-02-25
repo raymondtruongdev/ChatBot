@@ -3,6 +3,7 @@ import 'package:chat_bot/components/textfield_chat_input.dart';
 import 'package:chat_bot/models/message_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 
 final ChatBotController chatBotController =
     Get.put(ChatBotController(), permanent: true);
@@ -51,17 +52,31 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // display header of page
-        _topChat(),
-        // display all message
-        Expanded(child: _messageList()),
+    return Obx(() => (Column(
+          children: [
+            // display header of page
+            _topChat(),
+            // display all message
+            Expanded(child: _messageList()),
+            Container(
+              child: chatBotController.checkLoading().isTrue
+                  ? _botThinking()
+                  : (() {
+                      if (chatBotController.messages.isNotEmpty) {
+                        scroolDown();
+                        if (chatBotController.errorInfo != '') {
+                          return _botError();
+                        } else {
+                          return null;
+                        }
+                      }
+                    })(),
+            ),
 
-        // user input
-        _userInput(),
-      ],
-    );
+            // user input
+            _userInput(),
+          ],
+        )));
   }
 
   sendMessage() {
@@ -215,6 +230,30 @@ class _ChatPageState extends State<ChatPage> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _botThinking() {
+    return Padding(
+        padding: const EdgeInsets.only(bottom: 30.0),
+        child: SizedBox(
+          height: 100,
+          width: 200,
+          child: Lottie.asset("lib/assets/lottie_loading_3d_spheres.json"),
+        ));
+  }
+
+  Widget _botError() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20.0),
+      child: Container(
+        height: 50,
+        width: 300,
+        decoration: const BoxDecoration(
+            color: Colors.orange,
+            borderRadius: BorderRadius.all(Radius.circular(30))),
+        child: Center(child: Text(chatBotController.errorInfo)),
       ),
     );
   }

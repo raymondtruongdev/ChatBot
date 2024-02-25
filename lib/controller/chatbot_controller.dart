@@ -1,12 +1,15 @@
+import 'dart:async';
+
 import 'package:chat_bot/logger_custom.dart';
 import 'package:chat_bot/models/message_chat.dart';
 import 'package:chat_bot/models/open_ai_bot.dart';
 import 'package:get/state_manager.dart';
 
 class ChatBotController extends GetxController {
-  final RxBool _isLoading = true.obs;
+  final RxBool _isLoading = false.obs;
   List<ChatMessage> messages = [];
   var _historyOpenAIMessage = [];
+  String errorInfo = '';
 
   RxBool checkLoading() => _isLoading;
 
@@ -42,6 +45,9 @@ class ChatBotController extends GetxController {
 
 // Make a reequest to ChatBot
   void sendChatBot(ChatMessage newUserMessage) async {
+    errorInfo = '';
+    _isLoading.value = true;
+
     addHistoryBot(newUserMessage);
     try {
       final messageBot = await OpenAIBot.processData(_historyOpenAIMessage);
@@ -51,10 +57,12 @@ class ChatBotController extends GetxController {
         // Add new ChatBot message to HistoryBot list
         addHistoryBot(messageBot);
       } else {
-        CustomLogger().error('Cannot connect to the server.');
+        errorInfo = 'Cannot connect to the server.';
       }
+      _isLoading.value = false;
     } catch (e) {
       CustomLogger().error('An error occurred: $e');
+      _isLoading.value = false;
     }
   }
 }

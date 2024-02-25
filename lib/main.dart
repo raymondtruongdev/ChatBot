@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
     // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
     CustomLogger logger = CustomLogger();
-    logger.error('Screen 1 build');
+    logger.error('MyApp Screen build');
 
     return MaterialApp(
         debugShowCheckedModeBanner: false, // turn off debug banner
@@ -54,9 +54,11 @@ class _HomePageState extends State<HomePage> {
     double widthScreenDevice = MediaQuery.of(context).size.width;
     double heightScreenDevice = MediaQuery.of(context).size.height;
     if ((widthScreenDevice > 0) && (heightScreenDevice > 0)) {
-      logger.debug('Width: $widthScreenDevice, Height: $heightScreenDevice');
+      logger.debug(
+          'HomePage: Width: $widthScreenDevice, Height: $heightScreenDevice');
     } else {
-      logger.error('Screen size is 0');
+      logger.error(
+          'HomePage: Width: $widthScreenDevice, Height: $heightScreenDevice');
     }
     if ((widthScreenDevice > 0) && (heightScreenDevice > 0)) {
       return const ChatPage();

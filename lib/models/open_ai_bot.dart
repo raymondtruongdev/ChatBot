@@ -45,6 +45,8 @@ class OpenAIBot {
       default:
         // Using data from a json in demo file
         jsonData = jsResponse1;
+        // Simulate time delay to get data from Bot
+        await Future.delayed(const Duration(milliseconds: 2000));
     }
 
     if (jsonData != null) {
