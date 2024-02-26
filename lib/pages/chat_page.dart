@@ -182,26 +182,31 @@ class _ChatPageState extends State<ChatPage> {
   Widget _topChat() {
     return Container(
       height: 60,
-      color: Colors.green,
+      color: const Color(0xff1b2b33),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
+          const Row(
             children: [
-              const SizedBox(width: 10),
-              Container(
-                  width: 30,
-                  height: 30,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage('lib/assets/openai.png'),
-                        fit: BoxFit.fill),
-                  )),
-              const SizedBox(width: 10),
-              const Text(
-                'OpenAI Bot',
-                style: TextStyle(color: Colors.white, fontSize: 30),
+              SizedBox(width: 10),
+              Image(
+                height: 30,
+                image: AssetImage('lib/assets/metaLogo.png'),
               ),
+              // Container(
+              //     width: 30,
+              //     // height: 30,
+              //     decoration: const BoxDecoration(
+              //       image: DecorationImage(
+              //         image: AssetImage('lib/assets/metaLogo.png'),
+              //         // fit: BoxFit.fill,
+              //       ),
+              //     )),
+              // SizedBox(width: 10),
+              // const Text(
+              //   'OpenAI Bot',
+              //   style: TextStyle(color: Colors.white, fontSize: 30),
+              // ),
             ],
           ),
           Row(

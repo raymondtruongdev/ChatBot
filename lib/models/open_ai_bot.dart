@@ -11,7 +11,7 @@ class OpenAIBot {
     // the 1st message of history must be the system message as the following:
     historyOpenAIMessage.add({
       "role": "system",
-      "content": "Always answer in rhymes.",
+      "content": "You are helpfull assistant",
     });
     return historyOpenAIMessage; // Return the updated list
   }
