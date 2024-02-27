@@ -1,3 +1,4 @@
+import 'package:chat_bot/components/textfield_chat_input_circle.dart';
 import 'package:chat_bot/controller/chatbot_controller.dart';
 import 'package:chat_bot/components/textfield_chat_input.dart';
 import 'package:chat_bot/models/message_chat.dart';
@@ -70,16 +71,17 @@ class _CircleChatPageState extends State<CircleChatPage> {
             splitScreenMode: true,
             child: ClipOval(
               child: Container(
-                color: Colors.green,
-                width: 390,
-                height: 390,
-                child: const Center(
+                color: Colors.black,
+                width: watchSize,
+                height: watchSize,
+                child: Center(
                   child: Column(
                     children: [
                       // display header of page
-                      TopChat(),
+                      const TopChat(),
                       // display all message
-                      // Expanded(child: _messageList()),
+                      Expanded(child: _messageList()),
+                      const SizedBox(height: 10.0),
                       // Container(
                       //   child: chatBotController.checkLoading().isTrue
                       //       ? _botThinking()
@@ -96,7 +98,7 @@ class _CircleChatPageState extends State<CircleChatPage> {
                       // ),
 
                       // user input
-                      // _userInput(),
+                      _userInput(),
                     ],
                   ),
                 ),
@@ -153,7 +155,9 @@ class _CircleChatPageState extends State<CircleChatPage> {
 
   Widget _messageItem(var message) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
+      margin: (message.role == Role.user)
+          ? const EdgeInsets.only(top: 10)
+          : const EdgeInsets.only(top: 0),
       child: Stack(
         alignment: (message.role == Role.user)
             ? Alignment.topRight
@@ -161,9 +165,9 @@ class _CircleChatPageState extends State<CircleChatPage> {
         children: [
           Container(
             margin: (message.role == Role.user)
-                ? const EdgeInsets.only(left: 40, right: 10)
-                : const EdgeInsets.only(left: 10, right: 40, top: 25),
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                ? const EdgeInsets.only(left: 40, right: 30)
+                : const EdgeInsets.only(left: 30, right: 40, top: 30),
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
                 bottomLeft: const Radius.circular(20),
@@ -182,13 +186,13 @@ class _CircleChatPageState extends State<CircleChatPage> {
           Container(
             child: !(message.role == Role.user)
                 ? Container(
-                    margin: const EdgeInsets.only(left: 5),
+                    margin: const EdgeInsets.only(left: 10),
                     width: 40,
                     height: 40,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
-                          image: AssetImage('lib/assets/robot256.png'),
+                          image: AssetImage('lib/assets/m_assistant_120.png'),
                           fit: BoxFit.fill),
                     ))
                 : null,
@@ -199,12 +203,14 @@ class _CircleChatPageState extends State<CircleChatPage> {
   }
 
   Widget _userInput() {
-    return TextFieldChatInput(
+    return TextFieldChatInputCircle(
       hintText: 'Type a message',
       obscureText: false,
       controller: _messageController,
       focusNode: myfocusNode,
       onPressed: sendMessage,
+      // onSubmitted: (_) => sendMessage(),
+      onSubmitted: () => sendMessage(),
     );
   }
 
