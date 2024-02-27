@@ -1,6 +1,5 @@
 import 'package:chat_bot/controller/chatbot_controller.dart';
 import 'package:chat_bot/logger_custom.dart';
-import 'package:chat_bot/pages/chat_page.dart';
 import 'package:chat_bot/pages/circle_chat_page.dart';
 import 'package:chat_bot/themes/light_mode.dart';
 import 'package:flutter/material.dart';
@@ -109,36 +108,3 @@ class _CircleWigetState extends State<CircleWiget> {
     );
   }
 }
-
-// class WidgetTest extends StatefulWidget {
-//   const WidgetTest({super.key});
-
-//   @override
-//   State<WidgetTest> createState() => _WidgetTestState();
-// }
-
-// class _WidgetTestState extends State<WidgetTest> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       width: 36.w,
-//       height: 36.w,
-//       decoration: const BoxDecoration(
-//         shape: BoxShape.circle,
-//         color: Colors.blue,
-//       ),
-//       child: Center(
-//         child: IconButton(
-//           onPressed: () {
-//             // onPressed action
-//           },
-//           icon: Icon(
-//             Icons.refresh,
-//             color: Colors.white,
-//             size: 30.w,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }

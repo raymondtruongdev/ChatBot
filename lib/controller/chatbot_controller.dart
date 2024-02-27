@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:chat_bot/logger_custom.dart';
 import 'package:chat_bot/models/message_chat.dart';
 import 'package:chat_bot/models/open_ai_bot.dart';
@@ -12,6 +10,20 @@ class ChatBotController extends GetxController {
     } else {}
     super.onInit();
     resetHistoryBot();
+
+    // messages.add(ChatMessage(
+    //   text: 'Hello, who are you',
+    //   user: 'username',
+    //   createdAt: DateTime.now(),
+    //   role: Role.user,
+    // ));
+    // messages.add(ChatMessage(
+    //   text:
+    //       'I am an Intelligent Assistant system integrated by Mijo Connected. May I help you?',
+    //   user: 'AIBot',
+    //   createdAt: DateTime.now(),
+    //   role: Role.assistant,
+    // ));
   }
 
   // ==================== Variables ============================================
@@ -79,7 +91,7 @@ class ChatBotController extends GetxController {
   }
 
   void updateWatchSize(double widthScreen, double heightScreen) {
-    final CustomLogger logger = CustomLogger();
+    // final CustomLogger logger = CustomLogger();
     // If widthScreen <       0   : _watchSize = 0;
     // If widthScreen > maxScreen : _watchSize = maxScreen;
     // If 0 <= widthScreen <= maxScreen : _watchSize = widthScreen;
