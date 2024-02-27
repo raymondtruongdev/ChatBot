@@ -56,6 +56,12 @@ class _CircleChatPageState extends State<CircleChatPage> {
     );
   }
 
+  void onResetListMessages() {
+    chatBotController.resetMessageShowList();
+    chatBotController.resetHistoryBot();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     double watchSize = chatBotController.getWatchSize();
@@ -78,7 +84,9 @@ class _CircleChatPageState extends State<CircleChatPage> {
                   child: Column(
                     children: [
                       // display header of page
-                      const TopChat(),
+                      TopChat(
+                        onPressed: () => onResetListMessages,
+                      ),
                       // display all message
                       Expanded(child: _messageList()),
                       const SizedBox(height: 10.0),
@@ -324,7 +332,8 @@ class _CircleChatPageState extends State<CircleChatPage> {
 }
 
 class TopChat extends StatelessWidget {
-  const TopChat({super.key});
+  final Function onPressed;
+  const TopChat({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -383,11 +392,7 @@ class TopChat extends StatelessWidget {
                       ),
                     ),
                     child: ElevatedButton(
-                      onPressed: () {
-                        chatBotController.resetMessageShowList();
-                        chatBotController.resetHistoryBot();
-                        // setState(() {});
-                      },
+                      onPressed: onPressed(),
                       style: ButtonStyle(
                         elevation: MaterialStateProperty.all(
                             0), // Remove button elevation
