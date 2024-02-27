@@ -56,6 +56,16 @@ class _CircleChatPageState extends State<CircleChatPage> {
     );
   }
 
+  void scroolDownWithErrorBanner() {
+    const keyboardHeight = 0;
+
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent - keyboardHeight + 5,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.linear,
+    );
+  }
+
   void onResetListMessages() {
     chatBotController.resetMessageShowList();
     chatBotController.resetHistoryBot();
@@ -131,7 +141,7 @@ class _CircleChatPageState extends State<CircleChatPage> {
                                 ? const BotThinking()
                                 : (() {
                                     if (chatBotController.messages.isNotEmpty) {
-                                      // scroolDown();
+                                      scroolDownWithErrorBanner();
                                       if (chatBotController.errorInfo != '') {
                                         return const BotError();
                                       } else {
@@ -187,7 +197,7 @@ class TopChat extends StatelessWidget {
       splitScreenMode: true,
       child: Container(
         height: 65.w,
-        color: const Color(0xff1b2b33),
+        color: const Color(0xff145503),
         child: Padding(
           padding: EdgeInsets.only(top: 25.w),
           child: Row(
@@ -296,7 +306,7 @@ class MessageItem extends StatelessWidget {
                 ),
                 color: (message.role == Role.user)
                     ? Colors.deepPurple
-                    : Colors.green.shade800,
+                    : const Color(0xff095BBC),
               ),
               child: Text(message.text,
                   style: const TextStyle(color: Colors.white)),
