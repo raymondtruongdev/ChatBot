@@ -62,63 +62,7 @@ class _CircleChatPageState extends State<CircleChatPage> {
     setState(() {});
   }
 
-  @override
-  Widget build(BuildContext context) {
-    double watchSize = chatBotController.getWatchSize();
-    return Center(
-      child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: chatBotController.isCircleDevice() ? Colors.black : Colors.white,
-        child: Center(
-          child: ScreenUtilInit(
-            designSize: const Size(390, 390),
-            minTextAdapt: true,
-            splitScreenMode: true,
-            child: ClipOval(
-              child: Container(
-                color: Colors.black,
-                width: watchSize,
-                height: watchSize,
-                child: Center(
-                  child: Column(
-                    children: [
-                      // display header of page
-                      TopChat(
-                        onPressed: () => onResetListMessages,
-                      ),
-                      // display all message
-                      Expanded(child: _messageList()),
-                      const SizedBox(height: 10.0),
-                      // Container(
-                      //   child: chatBotController.checkLoading().isTrue
-                      //       ? _botThinking()
-                      //       : (() {
-                      //           if (chatBotController.messages.isNotEmpty) {
-                      //             scroolDown();
-                      //             if (chatBotController.errorInfo != '') {
-                      //               return _botError();
-                      //             } else {
-                      //               return null;
-                      //             }
-                      //           }
-                      //         })(),
-                      // ),
-
-                      // user input
-                      _userInput(),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  sendMessage() {
+  void sendMessage() {
     if (_messageController.text.isNotEmpty) {
       // Add new user's message to messages list
       ChatMessage newUserMessage = ChatMessage(
@@ -152,61 +96,70 @@ class _CircleChatPageState extends State<CircleChatPage> {
     setState(() {});
   }
 
+  @override
+  Widget build(BuildContext context) {
+    double watchSize = chatBotController.getWatchSize();
+    return Obx(() => Center(
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: chatBotController.isCircleDevice()
+                ? Colors.black
+                : Colors.white,
+            child: Center(
+              child: ScreenUtilInit(
+                designSize: const Size(390, 390),
+                minTextAdapt: true,
+                splitScreenMode: true,
+                child: ClipOval(
+                  child: Container(
+                    color: Colors.black,
+                    width: watchSize,
+                    height: watchSize,
+                    child: Center(
+                      child: Column(
+                        children: [
+                          // display header of page
+                          TopChat(
+                            onPressed: () => onResetListMessages,
+                          ),
+                          // display all message
+                          Expanded(child: _messageList()),
+                          const SizedBox(height: 10.0),
+                          Container(
+                            child: chatBotController.checkLoading().isTrue
+                                ? const BotThinking()
+                                : (() {
+                                    if (chatBotController.messages.isNotEmpty) {
+                                      // scroolDown();
+                                      if (chatBotController.errorInfo != '') {
+                                        return const BotError();
+                                      } else {
+                                        return null;
+                                      }
+                                    }
+                                  })(),
+                          ),
+
+                          // user input
+                          _userInput(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ));
+  }
+
   Widget _messageList() {
     return ListView(
       controller: _scrollController,
       children: chatBotController.messages
-          .map((message) => _messageItem(message))
+          .map((message) => MessageItem(message: message))
           .toList(),
-    );
-  }
-
-  Widget _messageItem(var message) {
-    return Container(
-      margin: (message.role == Role.user)
-          ? const EdgeInsets.only(top: 10)
-          : const EdgeInsets.only(top: 0),
-      child: Stack(
-        alignment: (message.role == Role.user)
-            ? Alignment.topRight
-            : Alignment.topLeft,
-        children: [
-          Container(
-            margin: (message.role == Role.user)
-                ? const EdgeInsets.only(left: 40, right: 30)
-                : const EdgeInsets.only(left: 30, right: 40, top: 30),
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                bottomLeft: const Radius.circular(20),
-                topLeft: Radius.circular((message.role == Role.user) ? 20 : 0),
-                bottomRight:
-                    Radius.circular((message.role == Role.user) ? 0 : 20),
-                topRight: const Radius.circular(20),
-              ),
-              color: (message.role == Role.user)
-                  ? Colors.deepPurple
-                  : Colors.green.shade800,
-            ),
-            child:
-                Text(message.text, style: const TextStyle(color: Colors.white)),
-          ),
-          Container(
-            child: !(message.role == Role.user)
-                ? Container(
-                    margin: const EdgeInsets.only(left: 10),
-                    width: 40,
-                    height: 40,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                          image: AssetImage('lib/assets/m_assistant_120.png'),
-                          fit: BoxFit.fill),
-                    ))
-                : null,
-          ),
-        ],
-      ),
     );
   }
 
@@ -217,116 +170,7 @@ class _CircleChatPageState extends State<CircleChatPage> {
       controller: _messageController,
       focusNode: myfocusNode,
       onPressed: sendMessage,
-      // onSubmitted: (_) => sendMessage(),
       onSubmitted: () => sendMessage(),
-    );
-  }
-
-  Widget _topChat() {
-    return ScreenUtilInit(
-      designSize: const Size(390, 390),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      child: Container(
-        height: 65.w,
-        color: const Color(0xff1b2b33),
-        child: Padding(
-          padding: EdgeInsets.only(top: 25.w),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 36.w,
-                    height: 36.w,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xff0B9AC5), // Border color
-                        width: 2.0.w, // Border width
-                      ),
-                    ),
-                    child: Center(
-                      child: SizedBox(
-                        height: 28.w,
-                        child: const Image(
-                          image: AssetImage('lib/assets/ic_mijo_logo.png'),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 15.w),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 15.w),
-                    child: Image(
-                      width: 120.w,
-                      image: const AssetImage('lib/assets/metaLogo.png'),
-                    ),
-                  ),
-                  SizedBox(width: 15.w),
-                  Container(
-                    width: 36.w,
-                    height: 36.w,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.blue,
-                      border: Border.all(
-                        color: Colors.white, // Border color
-                        width: 2.0.w, // Border width
-                      ),
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        chatBotController.resetMessageShowList();
-                        chatBotController.resetHistoryBot();
-                        setState(() {});
-                      },
-                      style: ButtonStyle(
-                        elevation: MaterialStateProperty.all(
-                            0), // Remove button elevation
-                        backgroundColor: MaterialStateProperty.all(Colors
-                            .transparent), // Set background color to transparent
-                        padding: MaterialStateProperty.all(EdgeInsets.zero),
-                      ),
-                      child: Icon(
-                        Icons.refresh,
-                        color: Colors.white,
-                        size: 30.w,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _botThinking() {
-    return Padding(
-        padding: const EdgeInsets.only(bottom: 30.0),
-        child: SizedBox(
-          height: 100,
-          width: 200,
-          child: Lottie.asset("lib/assets/lottie_loading_3d_spheres.json"),
-        ));
-  }
-
-  Widget _botError() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20.0),
-      child: Container(
-        height: 50,
-        width: 300,
-        decoration: const BoxDecoration(
-            color: Colors.orange,
-            borderRadius: BorderRadius.all(Radius.circular(30))),
-        child: Center(child: Text(chatBotController.errorInfo)),
-      ),
     );
   }
 }
@@ -411,6 +255,109 @@ class TopChat extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class MessageItem extends StatelessWidget {
+  final ChatMessage message;
+  const MessageItem({super.key, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return ScreenUtilInit(
+      designSize: const Size(390, 390),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      child: Container(
+        margin: (message.role == Role.user)
+            ? EdgeInsets.only(top: 10.w)
+            : const EdgeInsets.only(top: 0),
+        child: Stack(
+          alignment: (message.role == Role.user)
+              ? Alignment.topRight
+              : Alignment.topLeft,
+          children: [
+            Container(
+              margin: (message.role == Role.user)
+                  ? EdgeInsets.only(left: 60.w, right: 50.w)
+                  : EdgeInsets.only(left: 40.w, right: 60.w, top: 30.w),
+              padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.w),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20.w),
+                  topLeft:
+                      Radius.circular((message.role == Role.user) ? 20.w : 0),
+                  bottomRight:
+                      Radius.circular((message.role == Role.user) ? 0 : 20.w),
+                  topRight: Radius.circular(20.w),
+                ),
+                color: (message.role == Role.user)
+                    ? Colors.deepPurple
+                    : Colors.green.shade800,
+              ),
+              child: Text(message.text,
+                  style: const TextStyle(color: Colors.white)),
+            ),
+            Container(
+              child: !(message.role == Role.user)
+                  ? Container(
+                      margin: EdgeInsets.only(left: 30.w),
+                      width: 40.w,
+                      height: 40.w,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            image: AssetImage('lib/assets/m_assistant_120.png'),
+                            fit: BoxFit.fill),
+                      ))
+                  : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class BotThinking extends StatelessWidget {
+  const BotThinking({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ScreenUtilInit(
+      designSize: const Size(390, 390),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      child: SizedBox(
+        height: 100.w,
+        width: 200.w,
+        child: Lottie.asset("lib/assets/lottie_loading_3d_spheres.json"),
+      ),
+    );
+  }
+}
+
+class BotError extends StatelessWidget {
+  const BotError({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ScreenUtilInit(
+      designSize: const Size(390, 390),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: 5.0.w),
+        child: Container(
+          height: 30.w,
+          width: 200.w,
+          decoration: BoxDecoration(
+              color: Colors.orange,
+              borderRadius: BorderRadius.all(Radius.circular(30.w))),
+          child: Center(child: Text(chatBotController.errorInfo)),
         ),
       ),
     );
