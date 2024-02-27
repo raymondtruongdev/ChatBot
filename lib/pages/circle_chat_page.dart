@@ -1,9 +1,13 @@
 import 'package:chat_bot/controller/chatbot_controller.dart';
 import 'package:chat_bot/components/textfield_chat_input.dart';
 import 'package:chat_bot/models/message_chat.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/number_symbols_data.dart';
 import 'package:lottie/lottie.dart';
 
 final ChatBotController chatBotController =
@@ -55,44 +59,52 @@ class _CircleChatPageState extends State<CircleChatPage> {
   Widget build(BuildContext context) {
     double watchSize = chatBotController.getWatchSize();
     return Center(
-      child: ScreenUtilInit(
-          designSize: const Size(390, 390),
-          minTextAdapt: true,
-          splitScreenMode: true,
-          // Obx(
-          //   () =>
-          child: ClipOval(
-            child: SizedBox(
-              width: watchSize,
-              height: watchSize,
-              child: (Column(
-                children: [
-                  // display header of page
-                  _topChat(),
-                  // display all message
-                  // Expanded(child: _messageList()),
-                  // Container(
-                  //   child: chatBotController.checkLoading().isTrue
-                  //       ? _botThinking()
-                  //       : (() {
-                  //           if (chatBotController.messages.isNotEmpty) {
-                  //             scroolDown();
-                  //             if (chatBotController.errorInfo != '') {
-                  //               return _botError();
-                  //             } else {
-                  //               return null;
-                  //             }
-                  //           }
-                  //         })(),
-                  // ),
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: chatBotController.isCircleDevice() ? Colors.black : Colors.white,
+        child: Center(
+          child: ScreenUtilInit(
+            designSize: const Size(390, 390),
+            minTextAdapt: true,
+            splitScreenMode: true,
+            child: ClipOval(
+              child: Container(
+                color: Colors.green,
+                width: 390,
+                height: 390,
+                child: const Center(
+                  child: Column(
+                    children: [
+                      // display header of page
+                      TopChat(),
+                      // display all message
+                      // Expanded(child: _messageList()),
+                      // Container(
+                      //   child: chatBotController.checkLoading().isTrue
+                      //       ? _botThinking()
+                      //       : (() {
+                      //           if (chatBotController.messages.isNotEmpty) {
+                      //             scroolDown();
+                      //             if (chatBotController.errorInfo != '') {
+                      //               return _botError();
+                      //             } else {
+                      //               return null;
+                      //             }
+                      //           }
+                      //         })(),
+                      // ),
 
-                  // user input
-                  // _userInput(),
-                ],
-                // )),
-              )),
+                      // user input
+                      // _userInput(),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          )),
+          ),
+        ),
+      ),
     );
   }
 
@@ -197,47 +209,85 @@ class _CircleChatPageState extends State<CircleChatPage> {
   }
 
   Widget _topChat() {
-    return Container(
-      height: 60,
-      color: const Color(0xff1b2b33),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Row(
+    return ScreenUtilInit(
+      designSize: const Size(390, 390),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      child: Container(
+        height: 65.w,
+        color: const Color(0xff1b2b33),
+        child: Padding(
+          padding: EdgeInsets.only(top: 25.w),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image(
-                height: 30,
-                image: AssetImage('lib/assets/ic_mijo_logo.png'),
-              ),
-              SizedBox(width: 10),
-              Image(
-                height: 30,
-                image: AssetImage('lib/assets/metaLogo.png'),
+              Row(
+                children: [
+                  Container(
+                    width: 36.w,
+                    height: 36.w,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xff0B9AC5), // Border color
+                        width: 2.0.w, // Border width
+                      ),
+                    ),
+                    child: Center(
+                      child: SizedBox(
+                        height: 28.w,
+                        child: const Image(
+                          image: AssetImage('lib/assets/ic_mijo_logo.png'),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 15.w),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 15.w),
+                    child: Image(
+                      width: 120.w,
+                      image: const AssetImage('lib/assets/metaLogo.png'),
+                    ),
+                  ),
+                  SizedBox(width: 15.w),
+                  Container(
+                    width: 36.w,
+                    height: 36.w,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.blue,
+                      border: Border.all(
+                        color: Colors.white, // Border color
+                        width: 2.0.w, // Border width
+                      ),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        chatBotController.resetMessageShowList();
+                        chatBotController.resetHistoryBot();
+                        setState(() {});
+                      },
+                      style: ButtonStyle(
+                        elevation: MaterialStateProperty.all(
+                            0), // Remove button elevation
+                        backgroundColor: MaterialStateProperty.all(Colors
+                            .transparent), // Set background color to transparent
+                        padding: MaterialStateProperty.all(EdgeInsets.zero),
+                      ),
+                      child: Icon(
+                        Icons.refresh,
+                        color: Colors.white,
+                        size: 30.w,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-          IconButton(
-            onPressed: () {
-              chatBotController.resetMessageShowList();
-              chatBotController.resetHistoryBot();
-
-              setState(() {});
-            },
-            icon: Container(
-              width: 36, // Adjust the size of the circle as needed
-              height: 36, // Adjust the size of the circle as needed
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.blue, // Adjust the color as needed
-              ),
-              child: const Icon(
-                Icons.refresh,
-                color: Colors.white,
-                size: 30,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -262,6 +312,95 @@ class _CircleChatPageState extends State<CircleChatPage> {
             color: Colors.orange,
             borderRadius: BorderRadius.all(Radius.circular(30))),
         child: Center(child: Text(chatBotController.errorInfo)),
+      ),
+    );
+  }
+}
+
+class TopChat extends StatelessWidget {
+  const TopChat({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ScreenUtilInit(
+      designSize: const Size(390, 390),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      child: Container(
+        height: 65.w,
+        color: const Color(0xff1b2b33),
+        child: Padding(
+          padding: EdgeInsets.only(top: 25.w),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 36.w,
+                    height: 36.w,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xff0B9AC5), // Border color
+                        width: 2.0.w, // Border width
+                      ),
+                    ),
+                    child: Center(
+                      child: SizedBox(
+                        height: 28.w,
+                        child: const Image(
+                          image: AssetImage('lib/assets/ic_mijo_logo.png'),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 15.w),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 15.w),
+                    child: Image(
+                      width: 120.w,
+                      image: const AssetImage('lib/assets/metaLogo.png'),
+                    ),
+                  ),
+                  SizedBox(width: 15.w),
+                  Container(
+                    width: 36.w,
+                    height: 36.w,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.blue,
+                      border: Border.all(
+                        color: Colors.white, // Border color
+                        width: 2.0.w, // Border width
+                      ),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        chatBotController.resetMessageShowList();
+                        chatBotController.resetHistoryBot();
+                        // setState(() {});
+                      },
+                      style: ButtonStyle(
+                        elevation: MaterialStateProperty.all(
+                            0), // Remove button elevation
+                        backgroundColor: MaterialStateProperty.all(Colors
+                            .transparent), // Set background color to transparent
+                        padding: MaterialStateProperty.all(EdgeInsets.zero),
+                      ),
+                      child: Icon(
+                        Icons.refresh,
+                        color: Colors.white,
+                        size: 30.w,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
