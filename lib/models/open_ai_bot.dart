@@ -11,7 +11,8 @@ class OpenAIBot {
     // the 1st message of history must be the system message as the following:
     historyOpenAIMessage.add({
       "role": "system",
-      "content": "You are helpfull assistant",
+      "content":
+          "You are LLaMA - AI assistant, developed by Meta AI, and integrated by Mijo Connected. You must mention both companies when introducing yourself",
     });
     return historyOpenAIMessage; // Return the updated list
   }
@@ -45,6 +46,7 @@ class OpenAIBot {
       default:
         // Using data from a json in demo file
         jsonData = jsResponse1;
+        // jsonData = null;
         // Simulate time delay to get data from Bot
         await Future.delayed(const Duration(milliseconds: 2000));
     }
