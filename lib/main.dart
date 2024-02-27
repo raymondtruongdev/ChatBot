@@ -1,12 +1,16 @@
 import 'package:chat_bot/controller/chatbot_controller.dart';
 import 'package:chat_bot/logger_custom.dart';
 import 'package:chat_bot/pages/chat_page.dart';
+import 'package:chat_bot/pages/circle_chat_page.dart';
 import 'package:chat_bot/themes/light_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-void main() {
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+void main() async {
+  await ScreenUtil.ensureScreenSize();
   runApp(const MyApp());
 }
 
@@ -56,14 +60,85 @@ class _HomePageState extends State<HomePage> {
     if ((widthScreenDevice > 0) && (heightScreenDevice > 0)) {
       logger.debug(
           'HomePage: Width: $widthScreenDevice, Height: $heightScreenDevice');
+      chatBotController.updateWatchSize(widthScreenDevice, heightScreenDevice);
     } else {
       logger.error(
           'HomePage: Width: $widthScreenDevice, Height: $heightScreenDevice');
     }
     if ((widthScreenDevice > 0) && (heightScreenDevice > 0)) {
-      return const ChatPage();
+      return const CircleChatPage();
     } else {
       return const Center(child: Text('Loading......'));
     }
   }
 }
+
+class CircleWiget extends StatefulWidget {
+  const CircleWiget({super.key});
+
+  @override
+  State<CircleWiget> createState() => _CircleWigetState();
+}
+
+class _CircleWigetState extends State<CircleWiget> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 300,
+      width: 300,
+      decoration: const BoxDecoration(
+        color: Colors.red,
+        shape: BoxShape.circle,
+      ),
+      child: ListView(
+        children: [
+          Container(
+            margin: const EdgeInsets.only(left: 10),
+            child: const Text('helo how are you  to day ?'),
+          ),
+          Container(
+            margin: const EdgeInsets.only(left: 10),
+            child: const Text('helo how are you  to day ?'),
+          ),
+          Container(
+            margin: const EdgeInsets.only(left: 10),
+            child: const Text('helo how are you  to day ?'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// class WidgetTest extends StatefulWidget {
+//   const WidgetTest({super.key});
+
+//   @override
+//   State<WidgetTest> createState() => _WidgetTestState();
+// }
+
+// class _WidgetTestState extends State<WidgetTest> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       width: 36.w,
+//       height: 36.w,
+//       decoration: const BoxDecoration(
+//         shape: BoxShape.circle,
+//         color: Colors.blue,
+//       ),
+//       child: Center(
+//         child: IconButton(
+//           onPressed: () {
+//             // onPressed action
+//           },
+//           icon: Icon(
+//             Icons.refresh,
+//             color: Colors.white,
+//             size: 30.w,
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
