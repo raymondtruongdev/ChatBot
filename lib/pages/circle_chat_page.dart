@@ -187,7 +187,13 @@ class _CircleChatPageState extends State<CircleChatPage> {
         onPressed: sendMessage,
         onSubmitted: () => sendMessage(),
         onPressedVoiceChat: () {
+          // Hide keyboard
+          myfocusNode.unfocus();
+          // Clear text
+          _messageController.clear();
+          // Show the end of message list
           scroolDownAll();
+          // Go to VoiceRecognitionPage
           Navigator.push(
             context,
             MaterialPageRoute(
