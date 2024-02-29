@@ -23,7 +23,7 @@ class VoiceRecognitionPage extends StatefulWidget {
 class _VoiceRecognitionPageState extends State<VoiceRecognitionPage> {
   String status = RecordStatus.none;
   String textVoiceContent = '';
-  String filePathAudio = '';
+  String audioFilePath = '';
   String infoText = '';
 
   @override
@@ -71,16 +71,15 @@ class _VoiceRecognitionPageState extends State<VoiceRecognitionPage> {
         break;
 
       case RecordStatus.recording:
-        filePathAudio = '';
+        audioFilePath = '';
         await voiceBotController.startRecording();
         status = RecordStatus.recording;
         break;
 
       case RecordStatus.finishRecording:
-        filePathAudio =
+        audioFilePath =
             await voiceBotController.stopRecordingAndSaveFile() ?? '';
-        // filePathAudio = 'helo';
-        if (filePathAudio != '') {
+        if (audioFilePath != '') {
           status = RecordStatus.converting;
           onClick(status);
         } else {
@@ -90,19 +89,16 @@ class _VoiceRecognitionPageState extends State<VoiceRecognitionPage> {
         break;
 
       case RecordStatus.converting:
-        VoiceToText.processVoiceToText(filePathAudio).then((value) {
-          setState(() {
-            textVoiceContent = value;
-            if (textVoiceContent.isEmpty) {
-              infoText = 'Server Error\nPress to record again';
-              status = RecordStatus.none;
-            } else {
-              infoText = 'Press to record';
-              status = RecordStatus.finishConverting;
-            }
-          });
-        });
-        status = RecordStatus.converting;
+        textVoiceContent =
+            await voiceBotController.convertVoiceToText(audioFilePath) ?? '';
+        if (textVoiceContent.isEmpty) {
+          infoText = 'Server Error\nPress to record again';
+          status = RecordStatus.none;
+        } else {
+          infoText = 'Press to record';
+          status = RecordStatus.finishConverting;
+        }
+
         break;
 
       case RecordStatus.finishConverting:
