@@ -23,7 +23,6 @@ class VoiceRecognitionPage extends StatefulWidget {
 class _VoiceRecognitionPageState extends State<VoiceRecognitionPage> {
   String status = RecordStatus.none;
   String textVoiceContent = '';
-  String audioFilePath = '';
   String infoText = '';
 
   @override
@@ -71,26 +70,18 @@ class _VoiceRecognitionPageState extends State<VoiceRecognitionPage> {
         break;
 
       case RecordStatus.recording:
-        audioFilePath = '';
         await voiceBotController.startRecording();
         status = RecordStatus.recording;
         break;
 
       case RecordStatus.finishRecording:
-        audioFilePath =
-            await voiceBotController.stopRecordingAndSaveFile() ?? '';
-        if (audioFilePath != '') {
-          status = RecordStatus.converting;
-          onClick(status);
-        } else {
-          status = RecordStatus.none;
-        }
-
+        await voiceBotController.stopRecordingAndSaveFile();
+        status = RecordStatus.converting;
+        onClick(status);
         break;
 
       case RecordStatus.converting:
-        textVoiceContent =
-            await voiceBotController.convertVoiceToText(audioFilePath) ?? '';
+        textVoiceContent = await voiceBotController.convertVoiceToText() ?? '';
         if (textVoiceContent.isEmpty) {
           infoText = 'Server Error\nPress to record again';
           status = RecordStatus.none;

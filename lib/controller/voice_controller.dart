@@ -37,25 +37,23 @@ class VoiceBotController extends GetxController {
     }
   }
 
-  Future<String?> stopRecordingAndSaveFile() async {
+  Future<void> stopRecordingAndSaveFile() async {
     if (_isRecording == true) {
       voiceFilePath = await VoiceToText.stopRecording();
       if (voiceFilePath.isNotEmpty) {
         _isRecording = false;
       }
-      return voiceFilePath;
     }
-    return null;
   }
 
-  Future<String?> convertVoiceToText(String voiceFilePath) async {
+  Future<String?> convertVoiceToText() async {
     String textContent = '';
     if (voiceFilePath.isNotEmpty) {
       textContent = await VoiceToText.processVoiceToText(voiceFilePath);
+      // Delete file audio and reset file path
       await deleteFile(voiceFilePath);
       voiceFilePath = '';
     }
-    // Delete file audio and reset file path
 
     return textContent;
   }
