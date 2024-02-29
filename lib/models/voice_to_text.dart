@@ -23,14 +23,20 @@ class VoiceToText {
     String strOutput = '';
     String filename = filePath;
     String url = 'http://192.168.1.23:5000/speech_to_text';
-    var request = http.MultipartRequest('POST', Uri.parse(url));
-    request.files.add(
-      await http.MultipartFile.fromPath(
-        'file',
-        filename,
-        filename: filename.split("/").last,
-      ),
-    );
+    http.MultipartRequest request;
+    try {
+      request = http.MultipartRequest('POST', Uri.parse(url));
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'file',
+          filename,
+          filename: filename.split("/").last,
+        ),
+      );
+    } catch (e) {
+      CustomLogger().error('Error in make http request: ${e.toString()}');
+      return '';
+    }
 
     try {
       var streamedResponse = await request.send();
