@@ -1,6 +1,7 @@
 import 'package:chat_bot/components/textfield_chat_input_circle.dart';
 import 'package:chat_bot/controller/chatbot_controller.dart';
 import 'package:chat_bot/models/message_chat.dart';
+import 'package:chat_bot/pages/voice_recognition_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -170,13 +171,21 @@ class _CircleChatPageState extends State<CircleChatPage> {
 
   Widget _userInput() {
     return TextFieldChatInputCircle(
-      hintText: 'Type a message',
-      obscureText: false,
-      controller: _messageController,
-      focusNode: myfocusNode,
-      onPressed: sendMessage,
-      onSubmitted: () => sendMessage(),
-    );
+        hintText: 'Type a message',
+        obscureText: false,
+        controller: _messageController,
+        focusNode: myfocusNode,
+        onPressed: sendMessage,
+        onSubmitted: () => sendMessage(),
+        onPressedVoiceChat: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const VoiceRecognitionPage(),
+                  settings: const RouteSettings(name: 'InstalledAppPage'),
+                ),
+              )
+            });
   }
 }
 

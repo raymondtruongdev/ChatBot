@@ -6,17 +6,19 @@ class TextFieldChatInputCircle extends StatelessWidget {
   final bool obscureText;
   final TextEditingController controller;
   final FocusNode? focusNode;
-  final Function onPressed;
+  final Function()? onPressed;
   final Function onSubmitted;
+  final Function onPressedVoiceChat;
 
   const TextFieldChatInputCircle({
     super.key,
     required this.hintText,
     required this.obscureText,
     required this.controller,
-    required this.onPressed,
     this.focusNode,
     required this.onSubmitted,
+    this.onPressed,
+    required this.onPressedVoiceChat,
   });
 
   @override
@@ -60,14 +62,33 @@ class TextFieldChatInputCircle extends StatelessWidget {
                 margin: EdgeInsets.only(right: 5.w),
                 child: IconButton(
                   onPressed: () {
-                    onPressed();
+                    onPressedVoiceChat();
                   },
                   icon: const Icon(
-                    Icons.arrow_upward,
+                    Icons.mic,
                     color: Colors.white,
                   ),
                 ),
-              )
+              ),
+              // SizedBox(
+              //   width: 10.w,
+              // ),
+              // // Send Button for chat
+              // Container(
+              //   width: 40.w,
+              //   decoration: const BoxDecoration(
+              //       color: Colors.green, shape: BoxShape.circle),
+              //   margin: EdgeInsets.only(right: 5.w),
+              //   child: IconButton(
+              //     onPressed: () {
+              //       onPressed();
+              //     },
+              //     icon: const Icon(
+              //       Icons.arrow_upward,
+              //       color: Colors.white,
+              //     ),
+              //   ),
+              // )
             ],
           ),
         ),

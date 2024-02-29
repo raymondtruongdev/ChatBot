@@ -30,7 +30,7 @@ class OpenAIBot {
   }
 
   static Future<ChatMessage?> processData(var historyOpenAIMessage) async {
-    String onlineMode = 'online';
+    String onlineMode = 'ofline';
     dynamic jsonData;
     switch (onlineMode) {
       case 'online':
