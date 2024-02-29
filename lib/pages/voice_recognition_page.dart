@@ -24,6 +24,7 @@ class _VoiceRecognitionPageState extends State<VoiceRecognitionPage> {
   String status = RecordStatus.none;
   String textVoiceContent = '';
   String filePathAudio = '';
+  String infoText = '';
 
   @override
   void initState() {
@@ -92,7 +93,13 @@ class _VoiceRecognitionPageState extends State<VoiceRecognitionPage> {
         VoiceToText.processVoiceToText(filePathAudio).then((value) {
           setState(() {
             textVoiceContent = value;
-            status = RecordStatus.finishConverting;
+            if (textVoiceContent.isEmpty) {
+              infoText = 'Server Error\nPress to record again';
+              status = RecordStatus.none;
+            } else {
+              infoText = 'Press to record';
+              status = RecordStatus.finishConverting;
+            }
           });
         });
         status = RecordStatus.converting;
@@ -150,8 +157,8 @@ class _VoiceRecognitionPageState extends State<VoiceRecognitionPage> {
                             botText: 'Converting voice to text',
                           );
                         case RecordStatus.none:
-                          return const BotInfo(
-                            botText: "Press to record",
+                          return BotInfo(
+                            botText: infoText,
                           );
                         default:
                           return null;
@@ -393,7 +400,11 @@ class BotInfo extends StatelessWidget {
         children: [
           Center(
               child: Text(botText,
-                  style: TextStyle(color: Colors.white, fontSize: 20.sp))),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20.sp,
+                  ),
+                  textAlign: TextAlign.center)),
           SizedBox(height: 100.w),
         ],
       ),

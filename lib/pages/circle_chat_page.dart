@@ -296,8 +296,8 @@ class MessageItem extends StatelessWidget {
           children: [
             Container(
               margin: (message.role == Role.user)
-                  ? EdgeInsets.only(left: 60.w, right: 50.w)
-                  : EdgeInsets.only(left: 40.w, right: 60.w, top: 30.w),
+                  ? EdgeInsets.only(left: 80.w, right: 50.w)
+                  : EdgeInsets.only(left: 40.w, right: 80.w, top: 30.w),
               padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.w),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
