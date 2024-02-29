@@ -32,6 +32,7 @@ class _CircleChatPageState extends State<CircleChatPage> {
         Future.delayed(const Duration(milliseconds: 200), () => scroolDown());
       }
     });
+    chatBotController.setScroolDownMessageList(scroolDownAll);
   }
 
   @override
@@ -52,11 +53,19 @@ class _CircleChatPageState extends State<CircleChatPage> {
     );
   }
 
-  void scroolDownWithErrorBanner() {
-    const keyboardHeight = 0;
+  void scroolDownAll() {
+    Future.delayed(const Duration(milliseconds: 200), () {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.linear,
+      );
+    });
+  }
 
+  void scroolDownWithErrorBanner() {
     _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent - keyboardHeight + 5,
+      _scrollController.position.maxScrollExtent + 5,
       duration: const Duration(milliseconds: 300),
       curve: Curves.linear,
     );
@@ -177,15 +186,16 @@ class _CircleChatPageState extends State<CircleChatPage> {
         focusNode: myfocusNode,
         onPressed: sendMessage,
         onSubmitted: () => sendMessage(),
-        onPressedVoiceChat: () => {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const VoiceRecognitionPage(),
-                  settings: const RouteSettings(name: 'InstalledAppPage'),
-                ),
-              )
-            });
+        onPressedVoiceChat: () {
+          scroolDownAll();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const VoiceRecognitionPage(),
+              settings: const RouteSettings(name: 'InstalledAppPage'),
+            ),
+          );
+        });
   }
 }
 

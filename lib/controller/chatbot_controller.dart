@@ -37,6 +37,7 @@ class ChatBotController extends GetxController {
   double heightScreenDevice = 0.0;
   double _scaleRatio = 0.0;
   bool _isCircleDevice = false;
+  late Function scroolDownMessageList;
 
 // ==================== Getters ============================================
   RxBool checkLoading() => _isLoading;
@@ -71,6 +72,7 @@ class ChatBotController extends GetxController {
   void sendChatBot(ChatMessage newUserMessage) async {
     errorInfo = '';
     _isLoading.value = true;
+    scroolDownMessageList();
 
     addHistoryBot(newUserMessage);
     try {
@@ -116,5 +118,9 @@ class ChatBotController extends GetxController {
 
     widthScreenDevice = widthScreen;
     heightScreenDevice = heightScreen;
+  }
+
+  void setScroolDownMessageList(Function scroolDown) {
+    scroolDownMessageList = scroolDown;
   }
 }
