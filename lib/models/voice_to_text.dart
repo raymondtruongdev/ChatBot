@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:chat_bot/controller/request_permission.dart';
 import 'package:chat_bot/logger_custom.dart';
@@ -20,7 +21,7 @@ class VoiceToText {
     // return demoDelayReturnText(filePath);
     // Draft
     String strOutput = '';
-    String filename = 'sample/output.wav';
+    String filename = filePath;
     String url = 'http://192.168.1.23:5000/speech_to_text';
     var request = http.MultipartRequest('POST', Uri.parse(url));
     request.files.add(
@@ -36,7 +37,11 @@ class VoiceToText {
       if (streamedResponse.statusCode == 200) {
         var response = await http.Response.fromStream(streamedResponse);
         CustomLogger().debug('Response: ${response.body}');
-        strOutput = response.body;
+        var jsStr = response.body;
+        // Parse the JSON string
+        Map<String, dynamic> data = jsonDecode(jsStr);
+        // Extract text
+        strOutput = data['text'];
       } else {
         CustomLogger().error('Error: ${streamedResponse.reasonPhrase}');
       }
@@ -65,7 +70,7 @@ class VoiceToText {
       return false;
     } else {
       // Save file here
-      // /storage/emulated/0/Android/data/com.example.chat_bot/files/example.aac
+      // /storage/emulated/0/Android/data/com.mijo.chatbot/files/example.aac
       String filePath = '${directory.path}/example.aac';
       try {
         voiceBotController.soundRecorder.openRecorder();
