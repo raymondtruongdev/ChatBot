@@ -53,6 +53,7 @@ Future<bool> requestRecorderPermissions() async {
 Future<bool> requestMicrophonePermissions2() async {
   String errorMessage = '';
   // status of permission
+  // ignore: unused_local_variable
   PermissionStatus status = await Permission.microphone.status;
   if (await (Permission.microphone.isGranted)) {
     return true;
