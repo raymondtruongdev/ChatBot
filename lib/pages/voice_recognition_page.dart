@@ -50,6 +50,12 @@ class _VoiceRecognitionPageState extends State<VoiceRecognitionPage> {
 
   void onClick(String newSatus) async {
     switch (newSatus) {
+      case RecordStatus.exit:
+        textVoiceContent = '';
+        Navigator.pop(context);
+        status = RecordStatus.none;
+        break;
+
       case RecordStatus.none:
         status = RecordStatus.none;
         break;
@@ -164,7 +170,7 @@ class _VoiceRecognitionPageState extends State<VoiceRecognitionPage> {
                                 : status == RecordStatus.finishConverting
                                     ? 120.w
                                     : status == RecordStatus.none
-                                        ? 53.w
+                                        ? 120.w
                                         : 160.w),
                         decoration: BoxDecoration(
                           border: Border.all(
@@ -227,6 +233,13 @@ class _VoiceRecognitionPageState extends State<VoiceRecognitionPage> {
                                 ),
                               ] // Make button in Done status which use to show text or record again
                               else if (status == RecordStatus.none) ...[
+                                Button(
+                                  color: Colors.red,
+                                  iconData: Icons.arrow_back,
+                                  onPressed: () {
+                                    onClick(RecordStatus.exit);
+                                  },
+                                ),
                                 Button(
                                   color: Colors.green,
                                   iconData: Icons.mic,
