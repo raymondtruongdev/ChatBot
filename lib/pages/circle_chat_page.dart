@@ -158,7 +158,21 @@ class _CircleChatPageState extends State<CircleChatPage> {
                           ),
 
                           // user input
-                          _userInput(),
+                          Container(
+                            child: chatBotController.checkLoading().isFalse
+                                ? _userInput()
+                                : Padding(
+                                    padding: EdgeInsets.only(bottom: 30.w),
+                                    child: Center(
+                                      child: Text(
+                                        '... Thinking ...',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20.sp),
+                                      ),
+                                    ),
+                                  ),
+                          ),
                         ],
                       ),
                     ),
