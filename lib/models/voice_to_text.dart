@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 import 'package:chat_bot/controller/request_permission.dart';
 import 'package:chat_bot/logger_custom.dart';
 import 'package:chat_bot/pages/voice_recognition_page.dart';
@@ -22,6 +23,8 @@ class VoiceToText {
     // Draft
     String strOutput = '';
     String filename = filePath;
+    // filename =
+    //     '/storage/emulated/0/Android/data/com.mijo.chatbot/files/trungle.wav';
     String url = 'http://192.168.1.23:5000/speech_to_text';
     http.MultipartRequest request;
     try {
@@ -43,9 +46,8 @@ class VoiceToText {
       if (streamedResponse.statusCode == 200) {
         var response = await http.Response.fromStream(streamedResponse);
         CustomLogger().debug('Response: ${response.body}');
-        var jsStr = response.body;
         // Parse the JSON string
-        Map<String, dynamic> data = jsonDecode(jsStr);
+        Map<String, dynamic> data = jsonDecode(response.body);
         // Extract text
         strOutput = data['text'];
       } else {
@@ -53,53 +55,62 @@ class VoiceToText {
       }
     } catch (e) {
       CustomLogger().error('Error: $e');
+      // Demo return data when error to bypass process
+      // String jsonData =
+      //     '{"text": "m\\u1ed9t hai ba b\\u1ed1n n\\u0103m s\\u00e1u b\\u1ea3y t\\u00e1m ch\\u00edn m\\u01b0\\u1eddi."}';
+      // Map<String, dynamic> data = jsonDecode(jsonData);
+      // strOutput = data['text'];
     }
     return strOutput;
   }
 
-  static Future<bool> startRecording() async {
+  static Future<String> startRecording() async {
     // Request microphone permission
-    bool status = await requestMicrophonePermissions();
+    // bool status = await requestMicrophonePermissions();
+
+    // Check and Request for Recorder Permissions
+    bool status = await requestRecorderPermissions();
     if (status == false) {
-      return false;
+      return '';
     }
-    // Request storage permission only for Android version < V13
-    // status = await requestStoragePermissions();
-    // if (status == false) {
-    //   return false;
-    // }
 
     // Start Recording
     Directory? directory = await getExternalStorageDirectory();
     if (directory == null) {
       CustomLogger().error('Can not found directory to save recording');
-      return false;
+      return '';
     } else {
       // Save file here
       // /storage/emulated/0/Android/data/com.mijo.chatbot/files/example.aac
-      String filePath = '${directory.path}/example.aac';
+      String filePath = '${directory.path}/example.wav';
       try {
         voiceBotController.soundRecorder.openRecorder();
         await voiceBotController.soundRecorder.startRecorder(toFile: filePath);
-        return true;
+        return filePath;
       } catch (err) {
         CustomLogger().error('Error starting recording: $err');
-        return false;
+        return '';
       }
     }
   }
 
-  static Future<String> stopRecording() async {
-    var filePath = '';
-    // Stop recording
+  static Future<String> stopRecording(String voiceFilePath) async {
+    // voiceFilePath: this a a path we set when we start 'startRecording'
+    // filePathFromStopRecorder: this a a path we get when we call 'stopRecorder'
+    // If we set file type is 'aac'(e.g 'example.aac'): filePathFromStopRecorder will the same with voiceFilePath, and saved 'example.aac' succesfully
+    // If we set file type is 'wav'(e.g 'example.wav'): filePathFromStopRecorder allways return empty, but it still saved 'example.wav' succesfully. Maybe there is bug in 'flutter_sound' package
+    //
+    //Stop recorder, if there is error in stopping process, we set voiceFilePath is empty
     try {
-      filePath = await voiceBotController.soundRecorder.stopRecorder() ?? '';
+      var filePathFromStopRecorder =
+          await voiceBotController.soundRecorder.stopRecorder() ?? '';
       voiceBotController.soundRecorder.closeRecorder();
-      CustomLogger().debug('Recording saved to: $filePath');
-      return filePath;
+      CustomLogger()
+          .error('File Path when call StopRecorder: $filePathFromStopRecorder');
     } catch (err) {
       CustomLogger().error('Error stopping recording: $err');
-      return '';
+      voiceFilePath = '';
     }
+    return voiceFilePath;
   }
 }

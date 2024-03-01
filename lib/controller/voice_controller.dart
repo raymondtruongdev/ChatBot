@@ -31,7 +31,8 @@ class VoiceBotController extends GetxController {
   Future<void> startRecording() async {
     voiceFilePath = '';
     if (_isRecording == false) {
-      if (await VoiceToText.startRecording()) {
+      voiceFilePath = await VoiceToText.startRecording();
+      if (voiceFilePath.isNotEmpty) {
         _isRecording = true;
       }
     }
@@ -39,7 +40,8 @@ class VoiceBotController extends GetxController {
 
   Future<void> stopRecordingAndSaveFile() async {
     if (_isRecording == true) {
-      voiceFilePath = await VoiceToText.stopRecording();
+      // update file voice path when stop recorder
+      voiceFilePath = await VoiceToText.stopRecording(voiceFilePath);
       if (voiceFilePath.isNotEmpty) {
         _isRecording = false;
       }
@@ -82,4 +84,5 @@ class RecordStatus {
   static const String refresh = 'refresh';
   static const String converting = 'converting';
   static const String none = 'none';
+  static const String exit = 'exit';
 }
