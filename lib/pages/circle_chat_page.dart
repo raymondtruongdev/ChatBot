@@ -1,5 +1,6 @@
 import 'package:chat_bot/components/textfield_chat_input_circle.dart';
 import 'package:chat_bot/controller/chatbot_controller.dart';
+import 'package:chat_bot/controller/request_permission.dart';
 import 'package:chat_bot/models/message_chat.dart';
 import 'package:chat_bot/pages/voice_recognition_page.dart';
 import 'package:flutter/material.dart';
@@ -193,14 +194,20 @@ class _CircleChatPageState extends State<CircleChatPage> {
           _messageController.clear();
           // Show the end of message list
           scroolDownAll();
-          // Go to VoiceRecognitionPage
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const VoiceRecognitionPage(),
-              settings: const RouteSettings(name: 'InstalledAppPage'),
-            ),
-          );
+
+          // Check and Request for Recorder Permissions
+          requestRecorderPermissions().then((value) {
+            if (value == true) {
+              // Go to VoiceRecognitionPage
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const VoiceRecognitionPage(),
+                  settings: const RouteSettings(name: 'InstalledAppPage'),
+                ),
+              );
+            }
+          });
         });
   }
 }
