@@ -30,7 +30,7 @@ class OpenAIBot {
   }
 
   static Future<ChatMessage?> processData(var historyOpenAIMessage) async {
-    String onlineMode = 'ofline';
+    String onlineMode = 'online';
     dynamic jsonData;
     switch (onlineMode) {
       case 'online':
@@ -74,7 +74,10 @@ Future<String> makeChatCompletionsRequest(
     List<Map<String, dynamic>> historyOpenAIMessage) async {
   CustomLogger logger = CustomLogger();
   String? jsonStr;
-  var url = Uri.parse('http://192.168.1.23:1234/v1/chat/completions');
+  // Phuc's computer
+  // var url = Uri.parse('http://192.168.1.23:1234/v1/chat/completions');
+  // Tu's computer
+  var url = Uri.parse('http://192.168.1.12:1234/v1/chat/completions');
 
   var headers = {'Content-Type': 'application/json'};
 
