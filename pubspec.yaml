@@ -45,6 +45,7 @@ dependencies:
   flutter_sound: ^9.3.6
   permission_handler: ^11.3.0
   device_info_plus: ^9.1.2
+  speech_to_text: ^6.6.1
 
 dev_dependencies:
   flutter_test:

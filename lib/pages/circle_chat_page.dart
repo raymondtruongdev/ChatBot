@@ -3,6 +3,7 @@ import 'package:chat_bot/controller/chatbot_controller.dart';
 import 'package:chat_bot/controller/request_permission.dart';
 import 'package:chat_bot/models/message_chat.dart';
 import 'package:chat_bot/pages/voice_recognition_page.dart';
+import 'package:chat_bot/pages/voice_to_text_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -66,7 +67,7 @@ class _CircleChatPageState extends State<CircleChatPage> {
 
   void scroolDownWithErrorBanner() {
     _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent + 5,
+      _scrollController.position.maxScrollExtent + 200,
       duration: const Duration(milliseconds: 300),
       curve: Curves.linear,
     );
@@ -212,12 +213,21 @@ class _CircleChatPageState extends State<CircleChatPage> {
           // Check and Request for Recorder Permissions
           requestRecorderPermissions().then((value) {
             if (value == true) {
-              // Go to VoiceRecognitionPage
+              // // Go to VoiceRecognitionPage
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => const VoiceRecognitionPage(),
+              //     settings: const RouteSettings(name: 'VoiceRecognitionPage'),
+              //   ),
+              // );
+
+              // Go to VoiceToTextPage
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const VoiceRecognitionPage(),
-                  settings: const RouteSettings(name: 'InstalledAppPage'),
+                  builder: (context) => const VoiceToTextPage(),
+                  settings: const RouteSettings(name: 'VoiceToTextPage'),
                 ),
               );
             }

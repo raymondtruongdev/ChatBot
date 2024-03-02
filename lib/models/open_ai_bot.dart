@@ -9,10 +9,14 @@ class OpenAIBot {
   static List<Map<String, dynamic>> resetHistoryOpenAIMessage() {
     List<Map<String, dynamic>> historyOpenAIMessage = []; // Reset the list
     // the 1st message of history must be the system message as the following:
+    // historyOpenAIMessage.add({
+    //   "role": "system",
+    //   "content":
+    //       "You are LLaMA - AI assistant, developed by Meta AI, and integrated by Mijo Connected. You must mention both companies when introducing yourself",
+    // });
     historyOpenAIMessage.add({
       "role": "system",
-      "content":
-          "You are LLaMA - AI assistant, developed by Meta AI, and integrated by Mijo Connected. You must mention both companies when introducing yourself",
+      "content": "You are a usefull assistant",
     });
     return historyOpenAIMessage; // Return the updated list
   }
@@ -77,7 +81,9 @@ Future<String> makeChatCompletionsRequest(
   // Phuc's computer
   // var url = Uri.parse('http://192.168.1.23:1234/v1/chat/completions');
   // Tu's computer
-  var url = Uri.parse('http://192.168.1.12:1234/v1/chat/completions');
+  // var url = Uri.parse('http://192.168.1.12:1234/v1/chat/completions');
+  // Toan's computer
+  var url = Uri.parse('http://192.168.2.142:1234/v1/chat/completions');
 
   var headers = {'Content-Type': 'application/json'};
 
