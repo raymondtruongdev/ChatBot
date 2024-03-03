@@ -112,7 +112,6 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
         _speech.listen(
           onResult: (val) => setState(() {
             textVoiceContent = val.recognizedWords;
-            status = RecordStatus.finishConverting;
             CustomLogger().info(textVoiceContent);
             if (val.hasConfidenceRating && val.confidence > 0) {
               _confidence = val.confidence;
