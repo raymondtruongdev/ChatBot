@@ -101,18 +101,6 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
       bool available = await _speech.initialize(
         onStatus: (val) async {
           CustomLogger().debug('onStatus: $val');
-
-          if (val == 'done') {
-            //   // await Future.delayed(const Duration(milliseconds: 500));
-            _speech.stop();
-            CustomLogger().debug('Speech stopped');
-            _isListening = false;
-
-            setState(() {
-              onClick(RecordStatus.finishConverting);
-              // Finish voice to textrecognition and change to State finishConverting
-            });
-          }
         },
         onError: (val) => CustomLogger().error('onError: $val'),
       );
@@ -121,6 +109,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
         _speech.listen(
           onResult: (val) => setState(() {
             textVoiceContent = val.recognizedWords;
+            status = RecordStatus.finishConverting;
             CustomLogger().info(textVoiceContent);
             if (val.hasConfidenceRating && val.confidence > 0) {
               _confidence = val.confidence;
