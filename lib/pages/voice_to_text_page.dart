@@ -35,7 +35,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
     _speech = stt.SpeechToText();
     _isListening = false;
     // status = RecordStatus.finishConverting;
-    onClick(RecordStatus.none);
+    onClick(RecordStatus.recording);
   }
 
   // Make a messeage and send to ChatBot
