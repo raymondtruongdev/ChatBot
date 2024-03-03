@@ -11,9 +11,6 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 final ChatBotController chatBotController =
     Get.put(ChatBotController(), permanent: true);
 
-final VoiceToTextController voiceBotController =
-    Get.put(VoiceToTextController(), permanent: true);
-
 class VoiceToTextPage extends StatefulWidget {
   const VoiceToTextPage({super.key});
 
@@ -25,6 +22,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
   String status = RecordStatus.none;
   String textVoiceContent = '';
   String infoText = '';
+  TextEditingController textController = TextEditingController();
 
   late stt.SpeechToText _speech;
   late bool _isListening = false;
@@ -34,7 +32,6 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
     super.initState();
     _speech = stt.SpeechToText();
     _isListening = false;
-    // status = RecordStatus.finishConverting;
     onClick(RecordStatus.recording);
   }
 
@@ -57,8 +54,8 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
   void onClick(String newSatus) async {
     switch (newSatus) {
       case RecordStatus.exit:
-        textVoiceContent = '';
-        status = RecordStatus.none;
+        // Call to stop recording and clear data
+        autoReCognition();
         Navigator.pop(context);
         return;
 
@@ -68,7 +65,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
 
       case RecordStatus.refresh:
         textVoiceContent = '';
-        // Call to stop recording
+        // Call to stop recording and clear data
         autoReCognition();
         // Set to None status
         status = RecordStatus.none;
@@ -76,11 +73,10 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
 
       case RecordStatus.send:
         // Return main Chat page
-        String str = voiceBotController.messageController.text;
+        String str = textController.text;
         sendMessage(str);
-        status = RecordStatus.none;
-        Navigator.pop(context);
-        return;
+        onClick(RecordStatus.exit);
+        break;
 
       case RecordStatus.recording:
         // Run autoReCognition to convert speech to text
@@ -151,7 +147,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
                   // Show text result
                   Expanded(
                       child: ContentVoice(
-                    controller: voiceBotController.messageController,
+                    controller: textController,
                     text: textVoiceContent,
                     status: status,
                   )),
