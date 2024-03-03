@@ -3,7 +3,12 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
     <application
+        android:enableOnBackInvokedCallback="true"
         android:label="chat_bot"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
@@ -43,6 +48,8 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+            <!-- <action android:name="android.speech.RecognitionService" /> -->
+
         </intent>
     </queries>
 </manifest>

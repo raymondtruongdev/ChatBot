@@ -1,10 +1,12 @@
 import 'package:chat_bot/controller/chatbot_controller.dart';
 import 'package:chat_bot/controller/voice_to_text_controller.dart';
+import 'package:chat_bot/logger_custom.dart';
 import 'package:chat_bot/models/message_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 final ChatBotController chatBotController =
     Get.put(ChatBotController(), permanent: true);
@@ -21,8 +23,20 @@ class VoiceToTextPage extends StatefulWidget {
 
 class _VoiceToTextPageState extends State<VoiceToTextPage> {
   String status = RecordStatus.none;
-  String textVoiceContent = ' Hello. How can I help you?';
+  String textVoiceContent = '';
   String infoText = '';
+
+  late stt.SpeechToText _speech;
+  late bool _isListening = false;
+  late double _confidence = 1.0;
+  @override
+  void initState() {
+    super.initState();
+    _speech = stt.SpeechToText();
+    _isListening = false;
+    // status = RecordStatus.finishConverting;
+    onClick(RecordStatus.finishConverting);
+  }
 
   // Make a messeage and send to ChatBot
   void sendMessage(String text) {
@@ -44,9 +58,9 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
     switch (newSatus) {
       case RecordStatus.exit:
         textVoiceContent = '';
-        Navigator.pop(context);
         status = RecordStatus.none;
-        break;
+        Navigator.pop(context);
+        return;
 
       case RecordStatus.none:
         status = RecordStatus.none;
@@ -54,44 +68,72 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
 
       case RecordStatus.refresh:
         textVoiceContent = '';
-        await voiceBotController.deleteFile(voiceBotController.voiceFilePath);
         status = RecordStatus.none;
         break;
 
       case RecordStatus.send:
         // Return main Chat page
-        Navigator.pop(context);
         String str = voiceBotController.messageController.text;
         sendMessage(str);
         status = RecordStatus.none;
-
-        break;
+        Navigator.pop(context);
+        return;
 
       case RecordStatus.recording:
-        await voiceBotController.startRecording();
+        // Run autoReCognition to convert speech to text
+        autoReCognition();
         status = RecordStatus.recording;
         break;
 
-      case RecordStatus.converting:
-        // textVoiceContent = await voiceBotController.convertVoiceToText() ?? '';
-        textVoiceContent = 'hello';
-        if (textVoiceContent.isEmpty) {
-          infoText = 'Server Error\nPress to record again';
-          status = RecordStatus.none;
-        } else {
-          infoText = 'Press to record';
-          status = RecordStatus.none;
-        }
-        break;
-
       case RecordStatus.finishConverting:
-        status = RecordStatus.finishConverting;
+        status = RecordStatus.none;
         break;
 
       default:
     }
 
     setState(() {});
+  }
+
+  void autoReCognition() async {
+    textVoiceContent = '';
+    if (!_isListening) {
+      bool available = await _speech.initialize(
+        onStatus: (val) async {
+          CustomLogger().debug('onStatus: $val');
+
+          if (val == 'done') {
+            //   // await Future.delayed(const Duration(milliseconds: 500));
+            _speech.stop();
+            CustomLogger().debug('Speech stopped');
+            _isListening = false;
+
+            setState(() {
+              onClick(RecordStatus.finishConverting);
+              // Finish voice to textrecognition and change to State finishConverting
+            });
+          }
+        },
+        onError: (val) => CustomLogger().error('onError: $val'),
+      );
+      if (available) {
+        setState(() => _isListening = true);
+        _speech.listen(
+          onResult: (val) => setState(() {
+            textVoiceContent = val.recognizedWords;
+            CustomLogger().info(textVoiceContent);
+            if (val.hasConfidenceRating && val.confidence > 0) {
+              _confidence = val.confidence;
+            }
+          }),
+        );
+      }
+    } else {
+      _speech.stop();
+      setState(() => _isListening = false);
+      _speech.stop();
+      CustomLogger().debug('Speech stopped');
+    }
   }
 
   @override
@@ -154,9 +196,9 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
                                     "lib/assets/lottie_loading_teal_dots.json"),
                               ),
                               Button(
-                                iconData: Icons.pause,
+                                iconData: Icons.arrow_back,
                                 onPressed: () {
-                                  onClick(RecordStatus.converting);
+                                  onClick(RecordStatus.exit);
                                 },
                               ),
                             ]
@@ -177,7 +219,6 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
                                 ),
                               ),
                             ]
-
                             // In finishConverting status will show Refresh button and Send button
                             else if (status ==
                                 RecordStatus.finishConverting) ...[
@@ -271,7 +312,44 @@ class ContentVoice extends StatelessWidget {
         minTextAdapt: true,
         splitScreenMode: true,
         child: (text.isEmpty)
-            ? Container()
+            ? Column(
+                children: [
+                  SizedBox(
+                    height: 10.w,
+                  ),
+                  SizedBox(
+                    height: 30.w,
+                    // child: Text('You can modify here',
+                    //     style: TextStyle(
+                    //       color: Colors.white,
+                    //       fontSize: 20.sp,
+                    //     )),
+                  ),
+                  SizedBox(
+                    height: 10.w,
+                  ),
+                  Container(
+                      margin: EdgeInsets.only(left: 50.w, right: 50.w),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.w),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(20.w),
+                            topLeft: Radius.circular(20.w),
+                            bottomRight: Radius.circular(20.w),
+                            topRight: Radius.circular(20.w),
+                          ),
+                          color: Colors.white),
+                      child: Text('Please Speeak Now',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20.sp,
+                          ))),
+                  SizedBox(
+                    height: 10.w,
+                  ),
+                ],
+              )
             : Column(
                 // alignment: Alignment.center,
                 children: [
@@ -290,6 +368,7 @@ class ContentVoice extends StatelessWidget {
                     height: 10.w,
                   ),
                   Container(
+                    width: double.infinity,
                     margin: EdgeInsets.only(left: 50.w, right: 50.w),
                     padding:
                         EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.w),
