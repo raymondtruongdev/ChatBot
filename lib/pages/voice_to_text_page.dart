@@ -65,7 +65,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
 
       case RecordStatus.refresh:
         textVoiceContent = '';
-        // Call to stop recording and clear data
+        // Call again to stop recording and clear data
         autoReCognition();
         // Set to None status
         status = RecordStatus.none;
@@ -81,11 +81,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
       case RecordStatus.recording:
         // Run autoReCognition to convert speech to text
         autoReCognition();
-        status = RecordStatus.finishConverting;
-        break;
-
-      case RecordStatus.finishConverting:
-        status = RecordStatus.none;
+        status = RecordStatus.recording;
         break;
 
       default:
@@ -157,13 +153,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
                     padding: EdgeInsets.only(bottom: 30.w),
                     child: Container(
                       height: 50.w,
-                      width: ((status == RecordStatus.recording)
-                          ? 160.w
-                          : status == RecordStatus.finishConverting
-                              ? 120.w
-                              : status == RecordStatus.none
-                                  ? 200.w
-                                  : 160.w),
+                      width: 160.w,
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: Theme.of(context).colorScheme.tertiary,
@@ -177,7 +167,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             // In finishConverting status will show Refresh button and Send button
-                            if (status == RecordStatus.finishConverting) ...[
+                            if (status == RecordStatus.recording) ...[
                               Button(
                                 iconData: Icons.refresh,
                                 onPressed: () {
@@ -206,13 +196,6 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
                                 iconData: Icons.mic,
                                 onPressed: () {
                                   onClick(RecordStatus.recording);
-                                },
-                              ),
-                              Button(
-                                color: Colors.blueAccent,
-                                iconData: Icons.arrow_upward,
-                                onPressed: () {
-                                  onClick(RecordStatus.send);
                                 },
                               ),
                             ],
