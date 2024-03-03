@@ -35,7 +35,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
     _speech = stt.SpeechToText();
     _isListening = false;
     // status = RecordStatus.finishConverting;
-    onClick(RecordStatus.finishConverting);
+    onClick(RecordStatus.none);
   }
 
   // Make a messeage and send to ChatBot
@@ -68,6 +68,9 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
 
       case RecordStatus.refresh:
         textVoiceContent = '';
+        // Call to stop recording
+        autoReCognition();
+        // Set to None status
         status = RecordStatus.none;
         break;
 
@@ -82,7 +85,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
       case RecordStatus.recording:
         // Run autoReCognition to convert speech to text
         autoReCognition();
-        status = RecordStatus.recording;
+        status = RecordStatus.finishConverting;
         break;
 
       case RecordStatus.finishConverting:
@@ -151,6 +154,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
                       child: ContentVoice(
                     controller: voiceBotController.messageController,
                     text: textVoiceContent,
+                    status: status,
                   )),
                   SizedBox(height: 10.0.w),
                   // Control bar
@@ -177,40 +181,8 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            // In Recoding status will show Record button
-                            if (status == RecordStatus.recording) ...[
-                              SizedBox(
-                                width: 90.w,
-                                child: Lottie.asset(
-                                    "lib/assets/lottie_loading_teal_dots.json"),
-                              ),
-                              Button(
-                                iconData: Icons.arrow_back,
-                                onPressed: () {
-                                  onClick(RecordStatus.exit);
-                                },
-                              ),
-                            ]
-                            // in converting status will show animation and text
-                            else if (status == RecordStatus.converting) ...[
-                              SizedBox(
-                                height: 40.w,
-                                width: 50.w,
-                                child: Lottie.asset(
-                                    "lib/assets/lottie_loading_3d_spheres.json"),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(right: 5.w),
-                                child: Text(
-                                  'Converting...',
-                                  style: TextStyle(
-                                      color: Colors.black, fontSize: 15.sp),
-                                ),
-                              ),
-                            ]
                             // In finishConverting status will show Refresh button and Send button
-                            else if (status ==
-                                RecordStatus.finishConverting) ...[
+                            if (status == RecordStatus.finishConverting) ...[
                               Button(
                                 iconData: Icons.refresh,
                                 onPressed: () {
@@ -225,6 +197,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
                                 },
                               ),
                             ] // In None status will show Exit button and Record button
+                            // in None status will show Exit, Record and Send button
                             else if (status == RecordStatus.none) ...[
                               Button(
                                 color: Colors.red,
@@ -291,31 +264,32 @@ class HeaderVoice extends StatelessWidget {
 class ContentVoice extends StatelessWidget {
   final String text;
   final TextEditingController controller;
-  const ContentVoice({super.key, this.text = '', required this.controller});
+  final String status;
+  const ContentVoice(
+      {super.key,
+      this.text = '',
+      required this.controller,
+      required this.status});
 
   @override
   Widget build(BuildContext context) {
     controller.text = text;
+    String bottext = '';
+    switch (status) {
+      case RecordStatus.none:
+        bottext = 'Press Microphone then Speak';
+        break;
+      default:
+    }
     return ScreenUtilInit(
         designSize: const Size(390, 390),
         minTextAdapt: true,
         splitScreenMode: true,
-        child: (text.isEmpty)
+        child: (status == RecordStatus.none)
             ? Column(
                 children: [
                   SizedBox(
-                    height: 10.w,
-                  ),
-                  SizedBox(
-                    height: 30.w,
-                    // child: Text('You can modify here',
-                    //     style: TextStyle(
-                    //       color: Colors.white,
-                    //       fontSize: 20.sp,
-                    //     )),
-                  ),
-                  SizedBox(
-                    height: 10.w,
+                    height: 50.w,
                   ),
                   Container(
                       margin: EdgeInsets.only(left: 50.w, right: 50.w),
@@ -329,10 +303,11 @@ class ContentVoice extends StatelessWidget {
                             topRight: Radius.circular(20.w),
                           ),
                           color: Colors.white),
-                      child: Text('Please Speeak Now',
+                      child: Text(bottext,
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.black,
-                            fontSize: 20.sp,
+                            fontSize: 18.sp,
                           ))),
                   SizedBox(
                     height: 10.w,
@@ -346,12 +321,14 @@ class ContentVoice extends StatelessWidget {
                     height: 10.w,
                   ),
                   SizedBox(
-                    height: 30.w,
-                    child: Text('You can modify here',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.sp,
-                        )),
+                    height: 60.w,
+                    child:
+                        Text('Keep Speaking \n When done, you can modify here',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18.sp,
+                            )),
                   ),
                   SizedBox(
                     height: 10.w,
@@ -373,8 +350,8 @@ class ContentVoice extends StatelessWidget {
                         // onSubmitted: (value) => onSubmitted(),
                         controller: controller,
                         // focusNode: focusNode,
-                        maxLines: 5,
-                        minLines: 1,
+                        maxLines: 4,
+                        minLines: 4,
                         decoration: const InputDecoration(
                           border: InputBorder.none,
                           fillColor: Colors.black,
