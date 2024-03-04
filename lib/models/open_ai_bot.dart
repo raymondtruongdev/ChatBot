@@ -16,7 +16,8 @@ class OpenAIBot {
     // });
     historyOpenAIMessage.add({
       "role": "system",
-      "content": "You are a usefull assistant",
+      "content":
+          "You are a useful assistant, your answer is shorter with enough helpful information.",
     });
     return historyOpenAIMessage; // Return the updated list
   }
@@ -82,8 +83,10 @@ Future<String> makeChatCompletionsRequest(
   // var url = Uri.parse('http://192.168.1.23:1234/v1/chat/completions');
   // Tu's computer
   // var url = Uri.parse('http://192.168.1.12:1234/v1/chat/completions');
-  // Toan's computer
-  var url = Uri.parse('http://192.168.2.142:1234/v1/chat/completions');
+  // Toan's computer o nha
+  // var url = Uri.parse('http://192.168.2.142:1234/v1/chat/completions');
+  // Toan's computer Mijo
+  var url = Uri.parse('http://192.168.1.14:1234/v1/chat/completions');
 
   var headers = {'Content-Type': 'application/json'};
 
