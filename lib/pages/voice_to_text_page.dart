@@ -21,6 +21,8 @@ class VoiceToTextPage extends StatefulWidget {
   State<VoiceToTextPage> createState() => _VoiceToTextPageState();
 }
 
+bool _isShowSpeakerIcon = true;
+
 class _VoiceToTextPageState extends State<VoiceToTextPage> {
   String status = RecordStatus.none;
   String textVoiceContent = '';
@@ -29,7 +31,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
   bool _hasSpeech = false;
   final bool _logEvents = false;
   final bool _onDevice = false;
-  late bool _isListening = false;
+
   final TextEditingController _pauseForController =
       TextEditingController(text: '3');
   final TextEditingController _listenForController =
@@ -63,7 +65,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
         _localeNames = await speech.locales();
 
         var systemLocale = await speech.systemLocale();
-        _currentLocaleId = systemLocale?.localeId ?? '';
+        _currentLocaleId = systemLocale?.localeId ?? ''; // vi_VN ,
       }
       if (!mounted) return;
 
@@ -74,6 +76,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
       setState(() {
         lastError = 'Speech recognition failed: ${e.toString()}';
         _hasSpeech = false;
+        CustomLogger().error('Speech recognition failed: $lastError');
       });
     }
   }
@@ -83,6 +86,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
     super.initState();
     initSpeechState();
     onClick(RecordStatus.recording);
+    _isShowSpeakerIcon = true;
   }
 
   // Make a messeage and send to ChatBot
@@ -105,41 +109,47 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
     switch (newSatus) {
       case RecordStatus.exit:
         stopListening();
-        Navigator.pop(context);
+        await Future.delayed(const Duration(milliseconds: 300), () {
+          Navigator.pop(context);
+        });
         return;
 
       case RecordStatus.none:
         stopListening();
-        await Future.delayed(const Duration(milliseconds: 500));
         return;
 
       case RecordStatus.recording:
-        // stopListening();
-        setState(() {
-          textVoiceContent = '';
-        });
-        await Future.delayed(const Duration(milliseconds: 500));
-        onClick(RecordStatus.converting);
+        CustomLogger()
+            .error('lastVoiceDetectionStatus: $lastVoiceDetectionStatus');
+        textVoiceContent = '';
+        setState(() {});
+        await Future.delayed(const Duration(milliseconds: 200));
+        if (_isShowSpeakerIcon == true) {
+          // If it is not in converting=>we start new converting
+          onClick(RecordStatus.converting);
+        } else {
+          // If it is in converting=>we stop current converting
+          onClick(RecordStatus.none);
+        }
+
         return;
 
       case RecordStatus.send:
         // Return main Chat page
+        stopListening();
         String str = textController.text;
         sendMessage(str);
-        stopListening();
-        textVoiceContent = '';
         onClick(RecordStatus.exit);
         return;
 
       case RecordStatus.converting:
+        _isShowSpeakerIcon = false;
         startListening();
-        // status = RecordStatus.recording;
-        break;
+        return;
 
       default:
+        CustomLogger().error('Unknown newSatus: $newSatus');
     }
-
-    setState(() {});
   }
 
   // This is called each time the users wants to start a new speech
@@ -153,7 +163,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
     final listenFor = int.tryParse(_listenForController.text);
     final options = SpeechListenOptions(
         onDevice: _onDevice,
-        listenMode: ListenMode.confirmation,
+        listenMode: ListenMode.dictation,
         cancelOnError: true,
         partialResults: true,
         autoPunctuation: true,
@@ -170,9 +180,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
       // onSoundLevelChange: soundLevelListener,
       listenOptions: options,
     );
-    setState(() {
-      _isListening = true;
-    });
+    setState(() {});
   }
 
   void stopListening() {
@@ -180,7 +188,6 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
     speech.stop();
     setState(() {
       level = 0.0;
-      _isListening = false;
     });
   }
 
@@ -195,15 +202,10 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
   /// This callback is invoked each time new recognition results are
   /// available after `listen` is called.
   void resultListener(SpeechRecognitionResult result) {
-    // _logEvent(
-    //     'Result listener final: ${result.finalResult}, words: ${result.recognizedWords}');
-
     setState(() {
       lastWords = '${result.recognizedWords} - ${result.finalResult}';
       textVoiceContent = result.recognizedWords;
-      // CustomLogger().info('result.recognizedWords: ${result.recognizedWords}');
-      // CustomLogger().info('result.finalResult: ${result.finalResult}');
-      CustomLogger().info('lastWords: $lastWords');
+      CustomLogger().info('textVoiceContent: $textVoiceContent');
 
       if (result.hasConfidenceRating && result.confidence > 0) {
         _confidence = result.confidence;
@@ -220,11 +222,13 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
   }
 
   void statusListener(String status) {
-    CustomLogger().error(
+    CustomLogger().info(
         'Received listener status: $status, listening: ${speech.isListening}');
-    setState(() {
-      lastVoiceDetectionStatus = status;
-    });
+
+    if (status == "done") {
+      _isShowSpeakerIcon = true;
+      setState(() {});
+    }
   }
 
   void _logEvent(String eventDescription) {
@@ -297,20 +301,11 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
                             ),
                             Button(
                               color: Colors.green,
-                              iconData: ((lastVoiceDetectionStatus == 'done') ||
-                                      (_isListening == false))
+                              iconData: (_isShowSpeakerIcon == true)
                                   ? Icons.mic
                                   : Icons.stop,
                               onPressed: () {
-                                if (_isListening == true) {
-                                  if (lastVoiceDetectionStatus == 'done') {
-                                    onClick(RecordStatus.recording);
-                                  } else {
-                                    onClick(RecordStatus.none);
-                                  }
-                                } else {
-                                  onClick(RecordStatus.recording);
-                                }
+                                onClick(RecordStatus.recording);
                               },
                             ),
                             Button(
