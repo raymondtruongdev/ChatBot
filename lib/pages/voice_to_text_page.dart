@@ -27,12 +27,13 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
   late stt.SpeechToText _speech;
   late bool _isListening = false;
   late double _confidence = 1.0;
+
   @override
   void initState() {
     super.initState();
     _speech = stt.SpeechToText();
     _isListening = false;
-    onClick(RecordStatus.recording);
+    onClick(RecordStatus.none);
   }
 
   // Make a messeage and send to ChatBot
@@ -54,33 +55,25 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
   void onClick(String newSatus) async {
     switch (newSatus) {
       case RecordStatus.exit:
-        // Call to stop recording and clear data
-        autoReCognition();
         Navigator.pop(context);
         return;
 
       case RecordStatus.none:
-        status = RecordStatus.none;
         break;
 
       case RecordStatus.refresh:
         textVoiceContent = '';
-        // Call again to stop recording and clear data
-        autoReCognition();
-        // Set to None status
-        status = RecordStatus.none;
+
         break;
 
       case RecordStatus.send:
         // Return main Chat page
         String str = textController.text;
         sendMessage(str);
-        onClick(RecordStatus.exit);
+
         break;
 
       case RecordStatus.recording:
-        // Run autoReCognition to convert speech to text
-        autoReCognition();
         status = RecordStatus.recording;
         break;
 
@@ -140,6 +133,13 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
                 height: watchSize,
                 child: Column(children: [
                   const HeaderVoice(),
+                  SizedBox(
+                    height: 10.w,
+                  ),
+                  InfomationBanner(text: 'Infomation Banner', status: status),
+                  SizedBox(
+                    height: 10.w,
+                  ),
                   // Show text result
                   Expanded(
                       child: ContentVoice(
@@ -153,7 +153,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
                     padding: EdgeInsets.only(bottom: 30.w),
                     child: Container(
                       height: 50.w,
-                      width: 160.w,
+                      width: 200.w,
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: Theme.of(context).colorScheme.tertiary,
@@ -166,39 +166,34 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            // In finishConverting status will show Refresh button and Send button
-                            if (status == RecordStatus.recording) ...[
-                              Button(
-                                iconData: Icons.refresh,
-                                onPressed: () {
-                                  onClick(RecordStatus.refresh);
-                                },
-                              ),
-                              Button(
-                                color: Colors.blueAccent,
-                                iconData: Icons.arrow_upward,
-                                onPressed: () {
-                                  onClick(RecordStatus.send);
-                                },
-                              ),
-                            ] // In None status will show Exit button and Record button
-                            // in None status will show Exit, Record and Send button
-                            else if (status == RecordStatus.none) ...[
-                              Button(
-                                color: Colors.red,
-                                iconData: Icons.arrow_back,
-                                onPressed: () {
-                                  onClick(RecordStatus.exit);
-                                },
-                              ),
-                              Button(
-                                color: Colors.green,
-                                iconData: Icons.mic,
-                                onPressed: () {
-                                  onClick(RecordStatus.recording);
-                                },
-                              ),
-                            ],
+                            Button(
+                              color: Colors.red,
+                              iconData: Icons.arrow_back,
+                              onPressed: () {
+                                onClick(RecordStatus.exit);
+                              },
+                            ),
+                            Button(
+                              color: Colors.blueGrey,
+                              iconData: Icons.refresh,
+                              onPressed: () {
+                                onClick(RecordStatus.refresh);
+                              },
+                            ),
+                            Button(
+                              color: Colors.green,
+                              iconData: Icons.mic,
+                              onPressed: () {
+                                onClick(RecordStatus.recording);
+                              },
+                            ),
+                            Button(
+                              color: Colors.blueAccent,
+                              iconData: Icons.arrow_upward,
+                              onPressed: () {
+                                onClick(RecordStatus.send);
+                              },
+                            ),
                           ],
                         ),
                       ),
@@ -239,6 +234,41 @@ class HeaderVoice extends StatelessWidget {
   }
 }
 
+class InfomationBanner extends StatelessWidget {
+  final String text;
+  final String status;
+  const InfomationBanner({super.key, this.text = '', required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    return ScreenUtilInit(
+        designSize: const Size(390, 390),
+        minTextAdapt: true,
+        splitScreenMode: true,
+        child: Column(
+          children: [
+            Container(
+                margin: EdgeInsets.only(left: 50.w, right: 50.w),
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(20.w),
+                      topLeft: Radius.circular(20.w),
+                      bottomRight: Radius.circular(20.w),
+                      topRight: Radius.circular(20.w),
+                    ),
+                    color: Colors.black),
+                child: Text(text,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold))),
+          ],
+        ));
+  }
+}
+
 class ContentVoice extends StatelessWidget {
   final String text;
   final TextEditingController controller;
@@ -252,92 +282,40 @@ class ContentVoice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     controller.text = text;
-    String bottext = '';
-    switch (status) {
-      case RecordStatus.none:
-        bottext = 'Press Microphone then Speak';
-        break;
-      default:
-    }
+
     return ScreenUtilInit(
         designSize: const Size(390, 390),
         minTextAdapt: true,
         splitScreenMode: true,
-        child: (status == RecordStatus.none)
-            ? Column(
-                children: [
-                  SizedBox(
-                    height: 50.w,
+        child: Column(
+          // alignment: Alignment.center,
+          children: [
+            Container(
+              width: double.infinity,
+              margin: EdgeInsets.only(left: 50.w, right: 50.w),
+              padding: EdgeInsets.symmetric(horizontal: 10.w),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20.w),
+                    topLeft: Radius.circular(20.w),
+                    bottomRight: Radius.circular(20.w),
+                    topRight: Radius.circular(20.w),
                   ),
-                  Container(
-                      margin: EdgeInsets.only(left: 50.w, right: 50.w),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.w),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(20.w),
-                            topLeft: Radius.circular(20.w),
-                            bottomRight: Radius.circular(20.w),
-                            topRight: Radius.circular(20.w),
-                          ),
-                          color: Colors.white),
-                      child: Text(bottext,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18.sp,
-                          ))),
-                  SizedBox(
-                    height: 10.w,
-                  ),
-                ],
-              )
-            : Column(
-                // alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    height: 10.w,
-                  ),
-                  SizedBox(
-                    height: 60.w,
-                    child:
-                        Text('Keep Speaking \n When done, you can modify here',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18.sp,
-                            )),
-                  ),
-                  SizedBox(
-                    height: 10.w,
-                  ),
-                  Container(
-                    width: double.infinity,
-                    margin: EdgeInsets.only(left: 50.w, right: 50.w),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.w),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20.w),
-                          topLeft: Radius.circular(20.w),
-                          bottomRight: Radius.circular(20.w),
-                          topRight: Radius.circular(20.w),
-                        ),
-                        color: Colors.white),
-                    child: TextField(
-                        // onSubmitted: (value) => onSubmitted(),
-                        controller: controller,
-                        // focusNode: focusNode,
-                        maxLines: 4,
-                        minLines: 4,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          fillColor: Colors.black,
-                          // hintText: 'Type a message',
-                        )),
-                  ),
-                ],
-              ));
+                  color: Colors.white),
+              child: TextField(
+                  // onSubmitted: (value) => onSubmitted(),
+                  controller: controller,
+                  // focusNode: focusNode,
+                  maxLines: 4,
+                  minLines: 4,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    fillColor: Colors.black,
+                    // hintText: 'Type a message',
+                  )),
+            ),
+          ],
+        ));
   }
 }
 
