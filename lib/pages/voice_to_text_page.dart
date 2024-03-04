@@ -5,8 +5,11 @@ import 'package:chat_bot/models/message_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:lottie/lottie.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:speech_to_text/speech_recognition_error.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 final ChatBotController chatBotController =
     Get.put(ChatBotController(), permanent: true);
@@ -21,19 +24,65 @@ class VoiceToTextPage extends StatefulWidget {
 class _VoiceToTextPageState extends State<VoiceToTextPage> {
   String status = RecordStatus.none;
   String textVoiceContent = '';
-  String infoText = '';
   TextEditingController textController = TextEditingController();
 
-  late stt.SpeechToText _speech;
+  bool _hasSpeech = false;
+  final bool _logEvents = false;
+  final bool _onDevice = false;
   late bool _isListening = false;
-  late double _confidence = 1.0;
+  final TextEditingController _pauseForController =
+      TextEditingController(text: '3');
+  final TextEditingController _listenForController =
+      TextEditingController(text: '30');
+  double level = 0.0;
+  double _confidence = 1;
+  double minSoundLevel = 50000;
+  double maxSoundLevel = -50000;
+  String lastWords = '';
+  String lastError = '';
+  String lastVoiceDetectionStatus = 'done';
+  String _currentLocaleId = '';
+  List<LocaleName> _localeNames = [];
+  final SpeechToText speech = SpeechToText();
+
+  /// This initializes SpeechToText. That only has to be done
+  /// once per application, though calling it again is harmless
+  /// it also does nothing. The UX of the sample app ensures that
+  /// it can only be called once.
+  Future<void> initSpeechState() async {
+    _logEvent('Initialize');
+    try {
+      var hasSpeech = await speech.initialize(
+        onError: errorListener,
+        onStatus: statusListener,
+        debugLogging: _logEvents,
+      );
+      if (hasSpeech) {
+        // Get the list of languages installed on the supporting platform so they
+        // can be displayed in the UI for selection by the user.
+        _localeNames = await speech.locales();
+
+        var systemLocale = await speech.systemLocale();
+        _currentLocaleId = systemLocale?.localeId ?? '';
+      }
+      if (!mounted) return;
+
+      setState(() {
+        _hasSpeech = hasSpeech;
+      });
+    } catch (e) {
+      setState(() {
+        lastError = 'Speech recognition failed: ${e.toString()}';
+        _hasSpeech = false;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _speech = stt.SpeechToText();
-    _isListening = false;
-    onClick(RecordStatus.none);
+    initSpeechState();
+    onClick(RecordStatus.recording);
   }
 
   // Make a messeage and send to ChatBot
@@ -55,26 +104,36 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
   void onClick(String newSatus) async {
     switch (newSatus) {
       case RecordStatus.exit:
+        stopListening();
         Navigator.pop(context);
         return;
 
       case RecordStatus.none:
-        break;
+        stopListening();
+        await Future.delayed(const Duration(milliseconds: 500));
+        return;
 
-      case RecordStatus.refresh:
-        textVoiceContent = '';
-
-        break;
+      case RecordStatus.recording:
+        // stopListening();
+        setState(() {
+          textVoiceContent = '';
+        });
+        await Future.delayed(const Duration(milliseconds: 500));
+        onClick(RecordStatus.converting);
+        return;
 
       case RecordStatus.send:
         // Return main Chat page
         String str = textController.text;
         sendMessage(str);
+        stopListening();
+        textVoiceContent = '';
+        onClick(RecordStatus.exit);
+        return;
 
-        break;
-
-      case RecordStatus.recording:
-        status = RecordStatus.recording;
+      case RecordStatus.converting:
+        startListening();
+        // status = RecordStatus.recording;
         break;
 
       default:
@@ -83,32 +142,95 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
     setState(() {});
   }
 
-  void autoReCognition() async {
-    textVoiceContent = '';
-    if (!_isListening) {
-      bool available = await _speech.initialize(
-        onStatus: (val) async {
-          CustomLogger().debug('onStatus: $val');
-        },
-        onError: (val) => CustomLogger().error('onError: $val'),
-      );
-      if (available) {
-        setState(() => _isListening = true);
-        _speech.listen(
-          onResult: (val) => setState(() {
-            textVoiceContent = val.recognizedWords;
-            CustomLogger().info(textVoiceContent);
-            if (val.hasConfidenceRating && val.confidence > 0) {
-              _confidence = val.confidence;
-            }
-          }),
-        );
+  // This is called each time the users wants to start a new speech
+  // recognition session
+  void startListening() {
+    _logEvent('start listening');
+    lastWords = '';
+    lastError = '';
+
+    final pauseFor = int.tryParse(_pauseForController.text);
+    final listenFor = int.tryParse(_listenForController.text);
+    final options = SpeechListenOptions(
+        onDevice: _onDevice,
+        listenMode: ListenMode.confirmation,
+        cancelOnError: true,
+        partialResults: true,
+        autoPunctuation: true,
+        enableHapticFeedback: true);
+    // Note that `listenFor` is the maximum, not the minimum, on some
+    // systems recognition will be stopped before this value is reached.
+    // Similarly `pauseFor` is a maximum not a minimum and may be ignored
+    // on some devices.
+    speech.listen(
+      onResult: resultListener,
+      listenFor: Duration(seconds: listenFor ?? 30),
+      pauseFor: Duration(seconds: pauseFor ?? 3),
+      localeId: _currentLocaleId,
+      // onSoundLevelChange: soundLevelListener,
+      listenOptions: options,
+    );
+    setState(() {
+      _isListening = true;
+    });
+  }
+
+  void stopListening() {
+    _logEvent('stop');
+    speech.stop();
+    setState(() {
+      level = 0.0;
+      _isListening = false;
+    });
+  }
+
+  void cancelListening() {
+    _logEvent('cancel');
+    speech.cancel();
+    setState(() {
+      level = 0.0;
+    });
+  }
+
+  /// This callback is invoked each time new recognition results are
+  /// available after `listen` is called.
+  void resultListener(SpeechRecognitionResult result) {
+    // _logEvent(
+    //     'Result listener final: ${result.finalResult}, words: ${result.recognizedWords}');
+
+    setState(() {
+      lastWords = '${result.recognizedWords} - ${result.finalResult}';
+      textVoiceContent = result.recognizedWords;
+      // CustomLogger().info('result.recognizedWords: ${result.recognizedWords}');
+      // CustomLogger().info('result.finalResult: ${result.finalResult}');
+      CustomLogger().info('lastWords: $lastWords');
+
+      if (result.hasConfidenceRating && result.confidence > 0) {
+        _confidence = result.confidence;
       }
-    } else {
-      _speech.stop();
-      setState(() => _isListening = false);
-      _speech.stop();
-      CustomLogger().debug('Speech stopped');
+    });
+  }
+
+  void errorListener(SpeechRecognitionError error) {
+    _logEvent(
+        'Received error status: $error, listening: ${speech.isListening}');
+    setState(() {
+      lastError = '${error.errorMsg} - ${error.permanent}';
+    });
+  }
+
+  void statusListener(String status) {
+    CustomLogger().error(
+        'Received listener status: $status, listening: ${speech.isListening}');
+    setState(() {
+      lastVoiceDetectionStatus = status;
+    });
+  }
+
+  void _logEvent(String eventDescription) {
+    if (_logEvents) {
+      var eventTime = DateTime.now().toIso8601String();
+      debugPrint('$eventTime $eventDescription');
     }
   }
 
@@ -174,17 +296,21 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
                               },
                             ),
                             Button(
-                              color: Colors.blueGrey,
-                              iconData: Icons.refresh,
-                              onPressed: () {
-                                onClick(RecordStatus.refresh);
-                              },
-                            ),
-                            Button(
                               color: Colors.green,
-                              iconData: Icons.mic,
+                              iconData: ((lastVoiceDetectionStatus == 'done') ||
+                                      (_isListening == false))
+                                  ? Icons.mic
+                                  : Icons.stop,
                               onPressed: () {
-                                onClick(RecordStatus.recording);
+                                if (_isListening == true) {
+                                  if (lastVoiceDetectionStatus == 'done') {
+                                    onClick(RecordStatus.recording);
+                                  } else {
+                                    onClick(RecordStatus.none);
+                                  }
+                                } else {
+                                  onClick(RecordStatus.recording);
+                                }
                               },
                             ),
                             Button(
