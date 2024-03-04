@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:chat_bot/controller/request_permission.dart';
 import 'package:chat_bot/logger_custom.dart';
-import 'package:chat_bot/pages/voice_recognition_page.dart';
+import 'package:chat_bot/pages/voice_file_text_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
@@ -16,7 +16,7 @@ Future<String> demoDelayReturnText(String text) async {
   return text;
 }
 
-class VoiceToText {
+class VoiceFileText {
   static Future<String> processVoiceToText(String filePath) async {
     // return demoDelayReturnText(filePath);
     // Draft

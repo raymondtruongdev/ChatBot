@@ -1,5 +1,4 @@
 import 'package:chat_bot/controller/chatbot_controller.dart';
-import 'package:chat_bot/controller/voice_controller.dart';
 import 'package:chat_bot/logger_custom.dart';
 import 'package:chat_bot/pages/circle_chat_page.dart';
 import 'package:chat_bot/themes/light_mode.dart';
@@ -17,9 +16,6 @@ void main() async {
 
 final ChatBotController chatBotController =
     Get.put(ChatBotController(), permanent: true);
-
-final VoiceBotController voiceBotController =
-    Get.put(VoiceBotController(), permanent: true);
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

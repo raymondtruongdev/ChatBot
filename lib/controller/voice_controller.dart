@@ -1,14 +1,14 @@
 import 'dart:io';
 
 import 'package:chat_bot/logger_custom.dart';
-import 'package:chat_bot/models/voice_to_text.dart';
+import 'package:chat_bot/models/voice_file_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 
 import 'package:get/state_manager.dart';
 
-class VoiceBotController extends GetxController {
+class VoiceFileTextBotController extends GetxController {
 // ==================== Variables ==============================================
 
   final TextEditingController messageController = TextEditingController();
@@ -31,7 +31,7 @@ class VoiceBotController extends GetxController {
   Future<void> startRecording() async {
     voiceFilePath = '';
     if (_isRecording == false) {
-      voiceFilePath = await VoiceToText.startRecording();
+      voiceFilePath = await VoiceFileText.startRecording();
       if (voiceFilePath.isNotEmpty) {
         _isRecording = true;
       }
@@ -41,7 +41,7 @@ class VoiceBotController extends GetxController {
   Future<void> stopRecordingAndSaveFile() async {
     if (_isRecording == true) {
       // update file voice path when stop recorder
-      voiceFilePath = await VoiceToText.stopRecording(voiceFilePath);
+      voiceFilePath = await VoiceFileText.stopRecording(voiceFilePath);
       if (voiceFilePath.isNotEmpty) {
         _isRecording = false;
       }
@@ -51,7 +51,7 @@ class VoiceBotController extends GetxController {
   Future<String?> convertVoiceToText() async {
     String textContent = '';
     if (voiceFilePath.isNotEmpty) {
-      textContent = await VoiceToText.processVoiceToText(voiceFilePath);
+      textContent = await VoiceFileText.processVoiceToText(voiceFilePath);
       // Delete file audio and reset file path
       await deleteFile(voiceFilePath);
       voiceFilePath = '';

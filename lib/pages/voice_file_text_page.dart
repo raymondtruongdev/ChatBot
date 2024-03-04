@@ -9,17 +9,17 @@ import 'package:lottie/lottie.dart';
 final ChatBotController chatBotController =
     Get.put(ChatBotController(), permanent: true);
 
-final VoiceBotController voiceBotController =
-    Get.put(VoiceBotController(), permanent: true);
+final VoiceFileTextBotController voiceBotController =
+    Get.put(VoiceFileTextBotController(), permanent: true);
 
-class VoiceRecognitionPage extends StatefulWidget {
-  const VoiceRecognitionPage({super.key});
+class VoiceFileTextPage extends StatefulWidget {
+  const VoiceFileTextPage({super.key});
 
   @override
-  State<VoiceRecognitionPage> createState() => _VoiceRecognitionPageState();
+  State<VoiceFileTextPage> createState() => _VoiceFileTextPageState();
 }
 
-class _VoiceRecognitionPageState extends State<VoiceRecognitionPage> {
+class _VoiceFileTextPageState extends State<VoiceFileTextPage> {
   String status = RecordStatus.none;
   String textVoiceContent = '';
   String infoText = '';

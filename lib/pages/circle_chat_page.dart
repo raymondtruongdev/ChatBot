@@ -2,8 +2,7 @@ import 'package:chat_bot/components/textfield_chat_input_circle.dart';
 import 'package:chat_bot/controller/chatbot_controller.dart';
 import 'package:chat_bot/controller/request_permission.dart';
 import 'package:chat_bot/models/message_chat.dart';
-import 'package:chat_bot/pages/voice_recognition_page.dart';
-import 'package:chat_bot/pages/voice_to_text_page.dart';
+import 'package:chat_bot/pages/speech_to_text_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -213,21 +212,21 @@ class _CircleChatPageState extends State<CircleChatPage> {
           // Check and Request for Recorder Permissions
           requestRecorderPermissions().then((value) {
             if (value == true) {
-              // // Go to VoiceRecognitionPage
+              // // Go to VoiceFileTextBotController
               // Navigator.push(
               //   context,
               //   MaterialPageRoute(
-              //     builder: (context) => const VoiceRecognitionPage(),
-              //     settings: const RouteSettings(name: 'VoiceRecognitionPage'),
+              //     builder: (context) => const VoiceFileTextBotController(),
+              //     settings: const RouteSettings(name: 'VoiceFileTextBotController'),
               //   ),
               // );
 
-              // Go to VoiceToTextPage
+              // Go to SpeechToTextPage
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const VoiceToTextPage(),
-                  settings: const RouteSettings(name: 'VoiceToTextPage'),
+                  builder: (context) => const SpeechToTextPage(),
+                  settings: const RouteSettings(name: 'SpeechToTextPage'),
                 ),
               );
             }

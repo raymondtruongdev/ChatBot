@@ -1,12 +1,10 @@
 import 'package:chat_bot/controller/chatbot_controller.dart';
-import 'package:chat_bot/controller/voice_to_text_controller.dart';
+import 'package:chat_bot/controller/speech_to_text_controller.dart';
 import 'package:chat_bot/logger_custom.dart';
 import 'package:chat_bot/models/message_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
-import 'package:lottie/lottie.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -14,16 +12,19 @@ import 'package:speech_to_text/speech_to_text.dart';
 final ChatBotController chatBotController =
     Get.put(ChatBotController(), permanent: true);
 
-class VoiceToTextPage extends StatefulWidget {
-  const VoiceToTextPage({super.key});
+final SpeechToTextController speechToTextController =
+    Get.put(SpeechToTextController(), permanent: true);
+
+class SpeechToTextPage extends StatefulWidget {
+  const SpeechToTextPage({super.key});
 
   @override
-  State<VoiceToTextPage> createState() => _VoiceToTextPageState();
+  State<SpeechToTextPage> createState() => _SpeechToTextPageState();
 }
 
 bool _isShowSpeakerIcon = true;
 
-class _VoiceToTextPageState extends State<VoiceToTextPage> {
+class _SpeechToTextPageState extends State<SpeechToTextPage> {
   String status = RecordStatus.none;
   String textVoiceContent = '';
   TextEditingController textController = TextEditingController();
@@ -65,7 +66,7 @@ class _VoiceToTextPageState extends State<VoiceToTextPage> {
         _localeNames = await speech.locales();
 
         var systemLocale = await speech.systemLocale();
-        _currentLocaleId = systemLocale?.localeId ?? ''; // vi_VN ,
+        _currentLocaleId = systemLocale?.localeId ?? ''; // vi_VN , "en_US"
       }
       if (!mounted) return;
 
