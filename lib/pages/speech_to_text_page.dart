@@ -107,6 +107,11 @@ class _SpeechToTextPageState extends State<SpeechToTextPage> {
   }
 
   void onClick(String newSatus) async {
+    if (_hasSpeech == false) {
+      CustomLogger().error('Error Speech recognition');
+      // Navigator.pop(context);
+      return;
+    }
     switch (newSatus) {
       case RecordStatus.exit:
         stopListening();
@@ -266,91 +271,134 @@ class _SpeechToTextPageState extends State<SpeechToTextPage> {
   Widget build(BuildContext context) {
     double watchSize = chatBotController.getWatchSize();
     // status = RecordStatus.none;
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: chatBotController.isCircleDevice() ? Colors.black : Colors.white,
-        child: Center(
-          child: ScreenUtilInit(
-            designSize: const Size(390, 390),
-            minTextAdapt: true,
-            splitScreenMode: true,
-            child: ClipOval(
-              child: Container(
-                color: Colors.black,
-                width: watchSize,
-                height: watchSize,
-                child: Column(children: [
-                  const HeaderVoice(),
-                  SizedBox(
-                    height: 10.w,
-                  ),
-                  InfomationBanner(text: 'Infomation Banner', status: status),
-                  SizedBox(
-                    height: 10.w,
-                  ),
-                  // Show text result
-                  Expanded(
-                      child: ContentVoice(
-                    controller: textController,
-                    text: textVoiceContent,
-                    status: status,
-                  )),
-                  SizedBox(height: 10.0.w),
-                  // Control bar
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 30.w),
-                    child: Container(
-                      height: 50.w,
-                      width: 200.w,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.tertiary,
-                        ),
-                        color: Theme.of(context).colorScheme.secondary,
-                        borderRadius: BorderRadius.all(Radius.circular(30.w)),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 5.w, right: 5.w),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Button(
-                              color: Colors.red,
-                              iconData: Icons.arrow_back,
-                              onPressed: () {
-                                onClick(RecordStatus.exit);
-                              },
-                            ),
-                            Button(
-                              color: Colors.green,
-                              iconData: (_isShowSpeakerIcon == true)
-                                  ? Icons.mic
-                                  : Icons.stop,
-                              onPressed: () {
-                                onClick(RecordStatus.recording);
-                              },
-                            ),
-                            Button(
-                              color: Colors.blueAccent,
-                              iconData: Icons.arrow_upward,
-                              onPressed: () {
-                                onClick(RecordStatus.send);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
+
+    if (_hasSpeech == false) {
+      CustomLogger().error('Error Speech recognition');
+      // Navigator.pop(context);
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: ScreenUtilInit(
+          designSize: const Size(390, 390),
+          minTextAdapt: true,
+          splitScreenMode: true,
+          child: Center(
+            child: Container(
+              padding: EdgeInsets.all(10.0.w),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0.w),
+                color: Colors.grey[200],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Recognizer Not Available',
+                    style: TextStyle(
+                      fontSize: 18.0.sp,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ]),
+                  SizedBox(height: 20.0.w),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Back'),
+                  ),
+                ],
               ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Scaffold(
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          color:
+              chatBotController.isCircleDevice() ? Colors.black : Colors.white,
+          child: Center(
+            child: ScreenUtilInit(
+              designSize: const Size(390, 390),
+              minTextAdapt: true,
+              splitScreenMode: true,
+              child: ClipOval(
+                child: Container(
+                  color: Colors.black,
+                  width: watchSize,
+                  height: watchSize,
+                  child: Column(children: [
+                    const HeaderVoice(),
+                    SizedBox(
+                      height: 10.w,
+                    ),
+                    InfomationBanner(text: 'Infomation Banner', status: status),
+                    SizedBox(
+                      height: 10.w,
+                    ),
+                    // Show text result
+                    Expanded(
+                        child: ContentVoice(
+                      controller: textController,
+                      text: textVoiceContent,
+                      status: status,
+                    )),
+                    SizedBox(height: 10.0.w),
+                    // Control bar
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 30.w),
+                      child: Container(
+                        height: 50.w,
+                        width: 200.w,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.tertiary,
+                          ),
+                          color: Theme.of(context).colorScheme.secondary,
+                          borderRadius: BorderRadius.all(Radius.circular(30.w)),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 5.w, right: 5.w),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Button(
+                                color: Colors.red,
+                                iconData: Icons.arrow_back,
+                                onPressed: () {
+                                  onClick(RecordStatus.exit);
+                                },
+                              ),
+                              Button(
+                                color: Colors.green,
+                                iconData: (_isShowSpeakerIcon == true)
+                                    ? Icons.mic
+                                    : Icons.stop,
+                                onPressed: () {
+                                  onClick(RecordStatus.recording);
+                                },
+                              ),
+                              Button(
+                                color: Colors.blueAccent,
+                                iconData: Icons.arrow_upward,
+                                onPressed: () {
+                                  onClick(RecordStatus.send);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ]),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
   }
 }
 
