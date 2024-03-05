@@ -110,7 +110,7 @@ class _SpeechToTextPageState extends State<SpeechToTextPage> {
     switch (newSatus) {
       case RecordStatus.exit:
         stopListening();
-        await Future.delayed(const Duration(milliseconds: 300), () {
+        await Future.delayed(const Duration(milliseconds: 500), () {
           Navigator.pop(context);
         });
         return;
@@ -173,14 +173,37 @@ class _SpeechToTextPageState extends State<SpeechToTextPage> {
     // systems recognition will be stopped before this value is reached.
     // Similarly `pauseFor` is a maximum not a minimum and may be ignored
     // on some devices.
-    speech.listen(
-      onResult: resultListener,
-      listenFor: Duration(seconds: listenFor ?? 30),
-      pauseFor: Duration(seconds: pauseFor ?? 3),
-      localeId: _currentLocaleId,
-      // onSoundLevelChange: soundLevelListener,
-      listenOptions: options,
-    );
+    if (speechToTextController.currentLocaleIdBot != 'default') {
+      try {
+        speech.listen(
+          onResult: resultListener,
+          listenFor: Duration(seconds: listenFor ?? 30),
+          pauseFor: Duration(seconds: pauseFor ?? 3),
+          localeId: speechToTextController.currentLocaleIdBot,
+          // onSoundLevelChange: soundLevelListener,
+          listenOptions: options,
+        );
+      } catch (e) {
+        speech.listen(
+          onResult: resultListener,
+          listenFor: Duration(seconds: listenFor ?? 30),
+          pauseFor: Duration(seconds: pauseFor ?? 3),
+          localeId: _currentLocaleId,
+          // onSoundLevelChange: soundLevelListener,
+          listenOptions: options,
+        );
+      }
+    } else {
+      speech.listen(
+        onResult: resultListener,
+        listenFor: Duration(seconds: listenFor ?? 30),
+        pauseFor: Duration(seconds: pauseFor ?? 3),
+        localeId: _currentLocaleId,
+        // onSoundLevelChange: soundLevelListener,
+        listenOptions: options,
+      );
+    }
+
     setState(() {});
   }
 

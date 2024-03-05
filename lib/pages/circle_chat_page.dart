@@ -2,6 +2,7 @@ import 'package:chat_bot/components/textfield_chat_input_circle.dart';
 import 'package:chat_bot/controller/chatbot_controller.dart';
 import 'package:chat_bot/controller/request_permission.dart';
 import 'package:chat_bot/models/message_chat.dart';
+import 'package:chat_bot/pages/setting_page.dart';
 import 'package:chat_bot/pages/speech_to_text_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -255,20 +256,37 @@ class TopChat extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Container(
-                    width: 36.w,
-                    height: 36.w,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xff0B9AC5), // Border color
-                        width: 2.0.w, // Border width
+                  Center(
+                    child: Container(
+                      width: 36.w,
+                      height: 36.w,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        border: Border.all(
+                          color: const Color(0xff0B9AC5), // Border color
+                          width: 2.0.w, // Border width
+                        ),
                       ),
-                    ),
-                    child: Center(
-                      child: SizedBox(
-                        height: 28.w,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Go to SettingPage
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SettingPage(),
+                              settings:
+                                  const RouteSettings(name: 'SettingPage'),
+                            ),
+                          );
+                        },
+                        style: ButtonStyle(
+                          elevation: MaterialStateProperty.all(
+                              0), // Remove button elevation
+                          backgroundColor: MaterialStateProperty.all(Colors
+                              .transparent), // Set background color to transparent
+                          padding: MaterialStateProperty.all(EdgeInsets.zero),
+                        ),
                         child: const Image(
                           image: AssetImage('lib/assets/ic_mijo_logo.png'),
                         ),
