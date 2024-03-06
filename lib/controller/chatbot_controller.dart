@@ -82,6 +82,7 @@ class ChatBotController extends GetxController {
     errorInfo = '';
     _isLoading.value = true;
     scroolDownMessageList();
+    // Play audio from user message
     ZaloTextToSpeech.processTextToSpeech((newUserMessage.text));
     addHistoryBot(newUserMessage);
 
@@ -92,7 +93,7 @@ class ChatBotController extends GetxController {
         addMessageShowList(messageBot);
         // Add new ChatBot message to HistoryBot list
         addHistoryBot(messageBot);
-        // Bot say
+        //Play audio from AIBot message
         // ZaloTextToSpeech.processTextToSpeech((messageBot.text));
       } else {
         errorInfo = 'Cannot connect to the server.';

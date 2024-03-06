@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:chat_bot/controller/chatbot_controller.dart';
-import 'package:chat_bot/logger_custom.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
@@ -13,24 +11,44 @@ final ChatBotController chatBotController =
 
 class ZaloTextToSpeech {
   static Future<String?> processTextToSpeech(String text) async {
-    String onlineMode = 'online';
-    String? audioPath = '';
-    switch (onlineMode) {
-      case 'online':
-        audioPath = await sendTextToZalo(text);
-        break;
-      case 'offline':
-        // audioPath = await sendTextToZalo(text);
-        break;
+    try {
+      String method = 'method2';
+      switch (method) {
+        case 'method1': // Reques link => download file to phone => play file
+          String zaloAudioUrl = await sendTextToZalo(text);
+          String audioPath = await downloadAudioFileZalo(zaloAudioUrl);
+          playAudioInDevice(audioPath);
+          return audioPath;
+
+        case 'method2': // Reques link => Play file in web
+          String zaloAudioUrl = await sendTextToZalo(text);
+          playAudioHttp(zaloAudioUrl);
+          // playAudioHttp(
+          //     "https://chunk.lab.zalo.ai/d0c64e63af0a46541f1b/d0c64e63af0a46541f1b");
+          return zaloAudioUrl;
+      }
+    } catch (e) {
+      return Future.error('Error module processTextToSpeech Zalo: $e');
     }
-    // playAudioHttp(
-    //     "https://chunk.lab.zalo.ai/bcb3b82f5a46b318ea57/bcb3b82f5a46b318ea57");
-    return audioPath;
+    return null;
   }
 }
 
-Future<String?> sendTextToZalo(String text) async {
-  String audioPath = '';
+// Send a text to Zalo and recive an audio link
+Future<String> sendTextToZalo(String text) async {
+  /* 
+  // Example request to Zalo:
+curl \
+  -H "apikey: kAW0DUygvKQR9sAeIpztRu50TB87E18x" \
+  --data-urlencode "input=Xin chào, tôi có thể giúp gì cho bạn?" \
+  -d "speaker_id=4" \
+  -d "speed=0.8" \
+  -X POST https://api.zalo.ai/v1/tts/synthesize
+
+  // Example Return from Zalo:
+  var jsonStr = {"data":{"url":"https://chunk.lab.zalo.ai/d0c64e63af0a46541f1b/d0c64e63af0a46541f1b"},"error_message":"Successful.","error_code":0}
+*/
+
   String apiKey = 'i2UqfgNK9J6i2hHkJjEjMRi23kCJGql3';
   String url = 'https://api.zalo.ai/v1/tts/synthesize';
   Map<String, String> headers = {
@@ -39,97 +57,84 @@ Future<String?> sendTextToZalo(String text) async {
   };
 
   Map<String, String> body = {
-    // 'input': 'Xin chào, tôi có thể giúp gì cho bạn?',
     'input': text,
     'encode_type': '0',
     'speaker_id': '1',
     'speed': '0.8',
   };
-/*
-curl \
-  -H "apikey: kAW0DUygvKQR9sAeIpztRu50TB87E18x" \
-  --data-urlencode "input=Xin chào, tôi có thể giúp gì cho bạn?" \
-  -d "speaker_id=4" \
-  -d "speed=0.8" \
-  -X POST https://api.zalo.ai/v1/tts/synthesize
-*/
+  // https://zalo.ai/docs/api/text-to-audio-converter
 
+  http.Response response;
   try {
-    var response = await http.post(
+    response = await http.post(
       Uri.parse(url),
       headers: headers,
       body: body,
     );
+  } catch (e) {
+    return Future.error('Error http post: $e');
+  }
 
-    if (response.statusCode == 200) {
+  if (response.statusCode == 200) {
+    try {
       Map<String, dynamic> jsonMap = json.decode(response.body);
       String zaloAudioUrl = jsonMap['data']['url'] ?? '';
-      CustomLogger().debug(zaloAudioUrl);
-
-      if (zaloAudioUrl.isNotEmpty) {
-        // Dowload file to phone then play
-        // await Future.delayed(const Duration(seconds: 1));
-        // audioPath = await makeDownloadVoiceZaloRequest(zaloAudioUrl);
-        // playAudio(audioPath);
-
-        //  Play directly in http
-        playAudioHttp(zaloAudioUrl);
-      }
-      return audioPath;
-    } else {
-      CustomLogger().error('Request failed: ${response.statusCode}');
-      return '';
+      return zaloAudioUrl;
+    } catch (e) {
+      return Future.error('Error in parse json: $e');
     }
-  } catch (e) {
-    CustomLogger().error('Error sending request: $e');
-    return '';
+  } else {
+    // Zalo server return a response.statusCode != 200
+    return Future.error('Zalo service error: ${response.statusCode}');
   }
 }
 
-Future<String> makeDownloadVoiceZaloRequest(String zaloAudioUrl) async {
+// Dowload file to phone and return file_path if success
+Future<String> downloadAudioFileZalo(String zaloAudioUrl) async {
+  Directory? directory;
+  // Get external storage directory
   try {
     // Start getting voice file and save to storage
-    Directory? directory = await getExternalStorageDirectory();
-    if (directory == null) {
-      CustomLogger().error('Can not found directory to save recording');
-      return '';
-    } else {
-      // Save file here
-      // /storage/emulated/0/Android/data/com.mijo.chatbot/files/zalo_voice.wav
-      String savePath = '${directory.path}/zalo_voice.wav';
-      // await deleteFile(savePath);
-      try {
-        // String url =
-        //     'https://chunk.lab.zalo.ai/d0c64e63af0a46541f1b/d0c64e63af0a46541f1b';
-
-        CustomLogger().error('Make download Zalo voice file: $zaloAudioUrl');
-        String url = zaloAudioUrl;
-        var response = await http.get(Uri.parse(url));
-        if (response.statusCode == 200) {
-          await saveToFile(response.bodyBytes, savePath);
-          CustomLogger().debug('File saved at: $savePath');
-          return savePath;
-        } else {
-          CustomLogger()
-              .error('Request  download Zalo  failed: ${response.statusCode}');
-          return '';
-        }
-      } catch (err) {
-        CustomLogger().error('Error in save Zalo voice file: $err');
-        return '';
-      }
-    }
+    directory = await getExternalStorageDirectory();
   } catch (err) {
-    CustomLogger().error('Error stopping recording: $err');
-    return '';
+    return Future.error('Error getting external storage: $err');
+  }
+
+  if (directory == null) {
+    return Future.error('Can not found directory to save file');
+  }
+  // Save file here
+  // /storage/emulated/0/Android/data/com.mijo.chatbot/files/zalo_voice.wav
+  String savePath = '${directory.path}/zalo_voice.wav';
+  // await deleteFile(savePath); // Delete old file if exist
+  try {
+    // String url =
+    //  'https://chunk.lab.zalo.ai/d0c64e63af0a46541f1b/d0c64e63af0a46541f1b';
+    String url = zaloAudioUrl;
+    var response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      await saveToFile(response.bodyBytes, savePath);
+      return savePath;
+    } else {
+      // Zalo server return a response.statusCode != 200
+      return Future.error('Zalo service error: ${response.statusCode}');
+    }
+  } catch (e) {
+    return Future.error('Error in http get: $e');
   }
 }
 
+// Save a file from internet to phone
 Future<void> saveToFile(List<int> bytes, String path) async {
-  final file = File(path);
-  await file.writeAsBytes(bytes);
+  try {
+    final file = File(path);
+    await file.writeAsBytes(bytes);
+  } catch (e) {
+    return Future.error("Failed saving file: $e");
+  }
 }
 
+// Delete a file in phone
 Future<void> deleteFile(String filePath) async {
   try {
     // Create a File instance
@@ -138,23 +143,35 @@ Future<void> deleteFile(String filePath) async {
     bool exists = await file.exists();
     if (exists) {
       // Delete the file
-      await file.delete();
+      file.delete();
     }
   } catch (e) {
-    CustomLogger().error('Error occurred while deleting the file: $e');
+    return Future.error("Error in deleting the file: $e");
   }
 }
 
-Future<void> playAudio(String audioPath) async {
-  final player = chatBotController.player;
-  await player.setAudioSource(AudioSource.file(audioPath));
-// Schemes: (https: | file: | asset: )
-  player.play(); // Play without waiting for completion
+// Play an audio file in device
+Future<void> playAudioInDevice(String audioPath) async {
+  // playAudioInDevice(
+  //   "/storage/emulated/0/Android/data/com.mijo.chatbot/files/zalo_voice.wav");
+  try {
+    final player = chatBotController.player;
+    await player.setAudioSource(AudioSource.file(audioPath));
+    player.play(); // Play without waiting for completion
+  } catch (e) {
+    return Future.error("Error playing the audio file in device: $e");
+  }
 }
 
+// Play an audio file with a link on web
 Future<void> playAudioHttp(String audioPath) async {
-  final player = chatBotController.player;
-  await player.setAudioSource(AudioSource.uri(Uri.parse(audioPath)));
-// Schemes: (https: | file: | asset: )
-  player.play(); // Play without waiting for completion
+  // playAudioHttp(
+  //   "https://chunk.lab.zalo.ai/d0c64e63af0a46541f1b/d0c64e63af0a46541f1b");
+  try {
+    final player = chatBotController.player;
+    await player.setAudioSource(AudioSource.uri(Uri.parse(audioPath)));
+    player.play(); // Play without waiting for completion
+  } catch (e) {
+    return Future.error("Error in playing the audio file from web: $e");
+  }
 }

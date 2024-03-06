@@ -379,9 +379,7 @@ class MessageItem extends StatelessWidget {
               ),
               child: TextButton(
                 onPressed: () {
-                  // Call your function here
-                  // yourFunction();
-                  print('hello');
+                  // Play audio from user message
                   ZaloTextToSpeech.processTextToSpeech((message.text));
                 },
                 child: Text(message.text,
