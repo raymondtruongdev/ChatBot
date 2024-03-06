@@ -13,7 +13,19 @@ curl http://192.168.1.23:1234/v1/chat/completions \
   "stream": false
 }';
 
+curl \
+  -H "apikey: kAW0DUygvKQR9sAeIpztRu50TB87E18x" \
+  --data-urlencode "input=Xin chào, tôi có thể giúp gì cho bạn?" \
+  -d "speaker_id=4" \
+  -d "speed=0.8" \
+  -X POST https://api.zalo.ai/v1/tts/synthesize
+
+
+ curl -o /Users/raymond/Downloads/zalo_audio.wav  https://chunk.lab.zalo.ai/d0c64e63af0a46541f1b/d0c64e63af0a46541f1b
+
 */
+
+// {"data":{"url":"https://chunk.lab.zalo.ai/b262822a63438a1dd352/b262822a63438a1dd352"},"error_message":"Successful.","error_code":0}
 
 var jsResponse1 = {
   "id": "chatcmpl-ezdun9glec5h6nkjyb89ni",

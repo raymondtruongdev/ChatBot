@@ -2,6 +2,7 @@ import 'package:chat_bot/components/textfield_chat_input_circle.dart';
 import 'package:chat_bot/controller/chatbot_controller.dart';
 import 'package:chat_bot/controller/request_permission.dart';
 import 'package:chat_bot/models/message_chat.dart';
+import 'package:chat_bot/models/zalo_text_to_speech.dart';
 import 'package:chat_bot/pages/setting_page.dart';
 import 'package:chat_bot/pages/speech_to_text_page.dart';
 import 'package:flutter/material.dart';
@@ -376,8 +377,16 @@ class MessageItem extends StatelessWidget {
                     ? Colors.deepPurple
                     : const Color(0xff095BBC),
               ),
-              child: Text(message.text,
-                  style: const TextStyle(color: Colors.white)),
+              child: TextButton(
+                onPressed: () {
+                  // Call your function here
+                  // yourFunction();
+                  print('hello');
+                  ZaloTextToSpeech.processTextToSpeech((message.text));
+                },
+                child: Text(message.text,
+                    style: const TextStyle(color: Colors.white)),
+              ),
             ),
             Container(
               child: !(message.role == Role.user)

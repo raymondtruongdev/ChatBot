@@ -47,6 +47,7 @@ dependencies:
   device_info_plus: ^9.1.2
   speech_to_text: ^6.6.1
   avatar_glow: ^3.0.1
+  just_audio: ^0.9.36
 
 dev_dependencies:
   flutter_test:

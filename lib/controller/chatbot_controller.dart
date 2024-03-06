@@ -1,7 +1,9 @@
 import 'package:chat_bot/logger_custom.dart';
 import 'package:chat_bot/models/message_chat.dart';
 import 'package:chat_bot/models/open_ai_bot.dart';
+import 'package:chat_bot/models/zalo_text_to_speech.dart';
 import 'package:get/state_manager.dart';
+import 'package:just_audio/just_audio.dart';
 
 class ChatBotController extends GetxController {
   @override
@@ -26,11 +28,18 @@ class ChatBotController extends GetxController {
     // ));
   }
 
+  @override
+  void dispose() {
+    player.dispose();
+    super.dispose();
+  }
+
   // ==================== Variables ============================================
   final RxBool _isLoading = false.obs;
   List<ChatMessage> messages = [];
   var _historyOpenAIMessage = [];
   String errorInfo = '';
+  final player = AudioPlayer();
 
   late double _watchSize = 1080.0;
   double widthScreenDevice = 0.0;
@@ -73,8 +82,9 @@ class ChatBotController extends GetxController {
     errorInfo = '';
     _isLoading.value = true;
     scroolDownMessageList();
-
+    ZaloTextToSpeech.processTextToSpeech((newUserMessage.text));
     addHistoryBot(newUserMessage);
+
     try {
       final messageBot = await OpenAIBot.processData(_historyOpenAIMessage);
       if (messageBot != null) {
@@ -82,6 +92,8 @@ class ChatBotController extends GetxController {
         addMessageShowList(messageBot);
         // Add new ChatBot message to HistoryBot list
         addHistoryBot(messageBot);
+        // Bot say
+        // ZaloTextToSpeech.processTextToSpeech((messageBot.text));
       } else {
         errorInfo = 'Cannot connect to the server.';
       }

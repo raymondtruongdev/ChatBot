@@ -108,8 +108,7 @@ class _SpeechToTextPageState extends State<SpeechToTextPage> {
 
   void onClick(String newSatus) async {
     if (_hasSpeech == false) {
-      CustomLogger().error('Error Speech recognition');
-      // Navigator.pop(context);
+      //  Speech recognition not available on this device, do nothing
       return;
     }
     switch (newSatus) {
