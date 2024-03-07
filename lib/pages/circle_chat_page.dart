@@ -188,6 +188,10 @@ class _CircleChatPageState extends State<CircleChatPage> {
 
   Widget _messageList() {
     return ListView(
+      // Estimate 'cacheExtent' based on the number of messages to fix
+      //  Flutter ListView Jumps skip some messages when user srools up the list
+      cacheExtent:
+          chatBotController.getWatchSize() * chatBotController.messages.length,
       controller: _scrollController,
       children: chatBotController.messages
           .map((message) => MessageItem(message: message))
