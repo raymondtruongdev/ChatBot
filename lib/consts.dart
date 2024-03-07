@@ -46,3 +46,22 @@ var jsResponse1 = {
   ],
   "usage": {"prompt_tokens": 31, "completion_tokens": 27, "total_tokens": 58}
 };
+
+var jsResponse2 = {
+  "id": "chatcmpl-ezdun9glec5h6nkjyb89ni",
+  "object": "chat.completion",
+  "created": 1708671348,
+  "model":
+      "C:\\Users\\tanph\\.cache\\lm-studio\\models\\TheBloke\\Llama-2-7B-Chat-GGUF\\llama-2-7b-chat.Q2_K.gguf",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Xin chào anh, em giúp gì được cho anh?"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {"prompt_tokens": 31, "completion_tokens": 27, "total_tokens": 58}
+};

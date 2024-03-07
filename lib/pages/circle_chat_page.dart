@@ -362,7 +362,7 @@ class MessageItem extends StatelessWidget {
             Container(
               margin: (message.role == Role.user)
                   ? EdgeInsets.only(left: 80.w, right: 50.w)
-                  : EdgeInsets.only(left: 40.w, right: 80.w, top: 30.w),
+                  : EdgeInsets.only(left: 50.w, right: 80.w, top: 40.w),
               padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.w),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
@@ -377,27 +377,28 @@ class MessageItem extends StatelessWidget {
                     ? Colors.deepPurple
                     : const Color(0xff095BBC),
               ),
-              child: TextButton(
-                onPressed: () {
-                  // Play audio from user message
-                  ZaloTextToSpeech.processTextToSpeech((message.text));
-                },
-                child: Text(message.text,
-                    style: const TextStyle(color: Colors.white)),
-              ),
+              child: Text(message.text,
+                  style: const TextStyle(color: Colors.white)),
             ),
             Container(
               child: !(message.role == Role.user)
-                  ? Container(
-                      margin: EdgeInsets.only(left: 30.w),
-                      width: 40.w,
-                      height: 40.w,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                            image: AssetImage('lib/assets/m_assistant_120.png'),
-                            fit: BoxFit.fill),
-                      ))
+                  ? TextButton(
+                      onPressed: () {
+                        // Play audio from Bot message
+                        ZaloTextToSpeech.processTextToSpeech((message.text));
+                      },
+                      child: Container(
+                          margin: EdgeInsets.only(left: 30.w),
+                          width: 40.w,
+                          height: 40.w,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                                image: AssetImage(
+                                    'lib/assets/m_assistant_120.png'),
+                                fit: BoxFit.fill),
+                          )),
+                    )
                   : null,
             ),
           ],
