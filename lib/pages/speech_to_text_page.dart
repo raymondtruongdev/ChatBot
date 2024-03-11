@@ -29,7 +29,7 @@ class _SpeechToTextPageState extends State<SpeechToTextPage> {
   String textVoiceContent = '';
   TextEditingController textController = TextEditingController();
 
-  bool _hasSpeech = false;
+  late bool _hasSpeech;
   final bool _logEvents = false;
   final bool _onDevice = false;
 
@@ -84,8 +84,9 @@ class _SpeechToTextPageState extends State<SpeechToTextPage> {
 
   @override
   void initState() {
-    super.initState();
+    _hasSpeech = true;
     initSpeechState();
+    super.initState();
     onClick(RecordStatus.recording);
     _isShowSpeakerIcon = true;
   }
