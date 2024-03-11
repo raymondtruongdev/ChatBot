@@ -26,6 +26,8 @@ class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     double watchSize = chatBotController.getWatchSize();
+    TextEditingController textController = TextEditingController();
+    textController.text = chatBotController.getIpBot();
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       body: Center(
@@ -89,6 +91,44 @@ class _SettingPageState extends State<SettingPage> {
                                 }).toList(),
                               ),
                             ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20.w,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 20.0.w),
+                        child: Row(
+                          children: [
+                            Text('IP AIBOT: ',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20.sp)),
+                            SizedBox(width: 10.w),
+                            Container(
+                              // height: 100.w,
+                              width: 200.w,
+                              decoration: BoxDecoration(
+                                // Set the background color here
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
+                              child: TextField(
+                                style: const TextStyle(color: Colors.white),
+                                controller: textController,
+                                minLines: 1,
+                                maxLines: 1,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  filled: true,
+                                  fillColor: Colors.blueGrey,
+                                ),
+                                onChanged: (text) {
+                                  // Set new Bot IP
+                                  chatBotController
+                                      .setIpBot(textController.text);
+                                },
+                              ),
+                            )
                           ],
                         ),
                       ),

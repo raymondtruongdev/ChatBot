@@ -12,6 +12,7 @@ class ChatBotController extends GetxController {
     } else {}
     super.onInit();
     resetHistoryBot();
+    setIpBot('192.168.1.14:1234');
 
     // messages.add(ChatMessage(
     //   text: 'Hello, who are you',
@@ -39,6 +40,7 @@ class ChatBotController extends GetxController {
   List<ChatMessage> messages = [];
   var _historyOpenAIMessage = [];
   String errorInfo = '';
+  late String _ipBot;
   final player = AudioPlayer();
 
   late double _watchSize = 1080.0;
@@ -48,13 +50,17 @@ class ChatBotController extends GetxController {
   bool _isCircleDevice = false;
   late Function scroolDownMessageList;
 
-// ==================== Getters ============================================
+// ==================== Getters ================================================
   RxBool checkLoading() => _isLoading;
   double getWatchSize() => _watchSize;
   double getScaleRatio() => _scaleRatio;
   bool isCircleDevice() => _isCircleDevice;
+  String getIpBot() => _ipBot;
 
-  // ==================== Uitlilty Functions ============================================
+// ==================== Setters ================================================
+  setIpBot(String newIp) => _ipBot = newIp;
+
+  // ==================== Uitlilty Functions ===================================
 // Add new message to the list to show in Chat View
   List<ChatMessage> addMessageShowList(ChatMessage newUserMessage) {
     messages.add(newUserMessage);
