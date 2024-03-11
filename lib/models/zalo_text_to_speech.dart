@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:chat_bot/controller/chatbot_controller.dart';
+import 'package:chat_bot/key/key.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
@@ -49,18 +50,18 @@ curl \
   var jsonStr = {"data":{"url":"https://chunk.lab.zalo.ai/d0c64e63af0a46541f1b/d0c64e63af0a46541f1b"},"error_message":"Successful.","error_code":0}
 */
 
-  String apiKey = 'i2UqfgNK9J6i2hHkJjEjMRi23kCJGql3';
   String url = 'https://api.zalo.ai/v1/tts/synthesize';
   Map<String, String> headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
-    'apikey': apiKey,
+    'apikey': apiZaloKey,
   };
 
   Map<String, String> body = {
     'input': text,
     'encode_type': '0',
     'speaker_id': '1',
-    'speed': '0.8',
+    'speed': '1.0',
+    'quality': '1',
   };
   // https://zalo.ai/docs/api/text-to-audio-converter
 

@@ -1,9 +1,14 @@
 import 'dart:convert';
 import 'package:chat_bot/consts.dart';
+import 'package:chat_bot/controller/chatbot_controller.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:chat_bot/logger_custom.dart';
 import 'package:chat_bot/models/open_ai_data.dart';
 import 'package:chat_bot/models/message_chat.dart';
+
+final ChatBotController chatBotController =
+    Get.put(ChatBotController(), permanent: true);
 
 class OpenAIBot {
   static List<Map<String, dynamic>> resetHistoryOpenAIMessage() {
@@ -86,15 +91,12 @@ Future<String> makeChatCompletionsRequest(
   // Toan's computer o nha
   // var url = Uri.parse('http://192.168.2.142:1234/v1/chat/completions');
   // Toan's computer Mijo
-  var url = Uri.parse('http://192.168.1.14:1234/v1/chat/completions');
+  // var url = Uri.parse('http://192.168.1.14:1234/v1/chat/completions');
 
+  String ipBot = chatBotController.getIpBot();
+  var url = Uri.parse('http://$ipBot/v1/chat/completions');
   var headers = {'Content-Type': 'application/json'};
-
   var body = jsonEncode({
-    // "messages": [
-    //   {"role": "system", "content": "Always answer in rhymes."},
-    //   {"role": "user", "content": "Introduce yourself."}
-    // ],
     "messages": historyOpenAIMessage,
     "temperature": 0.7,
     "max_tokens": -1,
