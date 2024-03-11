@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:chat_bot/consts.dart';
 import 'package:chat_bot/controller/chatbot_controller.dart';
+import 'package:chat_bot/key/key.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:chat_bot/logger_custom.dart';
@@ -67,8 +70,11 @@ class OpenAIBot {
       String content = choices.isNotEmpty ? choices[0].message!.content! : '';
       String role = choices.isNotEmpty ? choices[0].message!.role! : '';
 
+      // Change utf8 to support Vietnames
+      final decodedString = utf8.decode(content.codeUnits);
+      // print(decodedString);
       var newMessage = ChatMessage(
-        text: content,
+        text: decodedString,
         user: 'OpenAIBot',
         createdAt: DateTime.now(),
         role: role,
@@ -93,14 +99,25 @@ Future<String> makeChatCompletionsRequest(
   // Toan's computer Mijo
   // var url = Uri.parse('http://192.168.1.14:1234/v1/chat/completions');
 
-  String ipBot = chatBotController.getIpBot();
-  var url = Uri.parse('http://$ipBot/v1/chat/completions');
-  var headers = {'Content-Type': 'application/json'};
+// Offline model
+  // String ipBot = chatBotController.getIpBot();
+  // var url = Uri.parse('http://$ipBot/v1/chat/completions');
+  // var headers = {'Content-Type': 'application/json'};
+  // var body = jsonEncode({
+  //   "messages": historyOpenAIMessage,
+  //   "temperature": 0.7,
+  //   "max_tokens": -1,
+  //   "stream": false
+  // });
+
+  var url = Uri.parse('https://api.openai.com/v1/chat/completions');
+  var headers = {
+    'Content-Type': 'application/json',
+    "Authorization": "Bearer $openaiApiKey"
+  };
   var body = jsonEncode({
+    "model": "gpt-4-turbo-preview",
     "messages": historyOpenAIMessage,
-    "temperature": 0.7,
-    "max_tokens": -1,
-    "stream": false
   });
 
   http.Response response;
@@ -110,6 +127,7 @@ Future<String> makeChatCompletionsRequest(
     if (response.statusCode == 200) {
       // Successful response
       logger.debug('Response: ${response.body}');
+
       jsonStr = response.body;
       logger.debug(jsonStr);
       return response.body;
